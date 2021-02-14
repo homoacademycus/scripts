@@ -1,0 +1,11 @@
+# Depends on the hyperledger/fabric-peer image.
+version: '2'
+
+services:
+  couchdb-base:
+    image: couchdb:latest
+    expose:
+      - ${COUCH_PORT}
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PSWD=${COUCHDB_PSWD}

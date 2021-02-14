@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: Apache-2.0
+version: '2'
+
+volumes:
+  pgdata:
+  
+networks:
+  # explorer 네트워크
+  hlf-explorer.net:
+
+    # 연동할 외부의 네트워크 스택
+    external:
+      name: hlf-net
+
+services:
+  explorerdb.hlf-explorer.net:
+    image: hyperledger/explorer-db:latest
+    container_name: explorerdb.hlf-explorer.net
+    hostname: explorerdb.hlf-explorer.net
+    environment:
+      - DATABASE_DATABASE=fabricexplorer
+      - DATABASE_USERNAME=dbadmin
+      - DATABASE_PASSWORD=dbpasswd
+    healthcheck:
+      test: "pg_isready -h localhost -p 5432 -q -U postgres"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - hlf-explorer.net
+
+  explorer.hlf-explorer.net:
+    image: hyperledger/explorer:latest
+    container_name: explorer.hlf-explorer.net
+    hostname: explorer.hlf-explorer.net
+    environment:
+      - LOG_LEVEL_APP=info #debug
+      - LOG_LEVEL_DB=info #debug
+      - LOG_LEVEL_CONSOLE=info #debug
+      - LOG_CONSOLE_STDOUT=true
+      - DATABASE_HOST=explorerdb.hlf-explorer.net
+      - DATABASE_DATABASE=fabricexplorer
+      - DATABASE_USERNAME=dbadmin
+      - DATABASE_PASSWD=dbpasswd
+      - DISCOVERY_AS_LOCALHOST=false
+    volumes:
+      - ../${HLF_NET_NAME}/networkConfigs.json:/opt/explorer/app/platform/fabric/config.json
+      - ../${HLF_NET_NAME}/network/common:/opt/explorer/app/platform/fabric/connection-profile
+      - ../${HLF_NET_NAME}/userInfoWallet:/opt/wallet
+      - ../${HLF_NET_NAME}/userCrypto:/tmp/crypto
+    ports:
+      - 8080:8080
+    depends_on:
+      explorerdb.hlf-explorer.net:
+        condition: service_healthy
+    networks:
+      - hlf-explorer.net
+

@@ -1,0 +1,51 @@
+version: '3.2'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.1 #기본 이미지 사용
+    container_name: elasticsearch
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      discovery.type: single-node #간단한 local 테스트를 위해 single-node로 구성
+    volumes:
+      - /usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elk
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:7.6.1
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    volumes:
+      - type: bind
+        source: ./config/logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./config/logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+      - ./jar/mysql-connector-java-8.0.18.jar:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-java-8.0.18.jar #mysql 사용을 위한 jdbc-connector 다운
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch #elasticsearch 가 실행된 이후 logstash 실행되도록 depends_on 설정
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.6.1
+    ports:
+      - 5601:5601
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch #elasticsearch 가 실행된 이후 kibana 실행되도록 depends_on 설정
+    
+networks:
+ elk:
+  external:
+    name: mysql-network #이미 사용하고 있는 db와 연결을 위해 mysql-docker network 와 연결이 되도록 external 설정을 따로 해주었다. 
+
+volumes:
+ elasticsearch: #volume container 사용
+    

@@ -1,0 +1,18 @@
+version: "2" # v3 does not support 'extends' yet
+networks:
+  front-net:
+    # 연동할 외부의 네트워크 스택
+    external:
+      name: hlf-net
+
+services:
+  nginx-react:
+    image: nginx:latest
+    networks:
+      - front-net
+    ports:
+      - 80:80
+    expose:
+      - ${CA_PORT}
+    environment:
+      - FABRIC_CA_HOME=${FABRIC_CA_HOME}

@@ -1,0 +1,23 @@
+version: '2' # v3 does not support 'extends' yet
+
+######################################################################
+services:
+  react-npm:
+    image: react-npm:1116
+    tty: true
+    ports:
+      - 18282:3000
+    volumes:
+        - /home/clustergirl/nodejs/npm:/prj_home
+    working_dir: /prj_home
+
+  react-yarn:
+    image: react-yarn:1116
+    tty: true
+    ports:
+      - 28282:3000
+    volumes:
+        - /home/clustergirl/nodejs/yarn:/prj_home
+    working_dir: /prj_home
+
+  

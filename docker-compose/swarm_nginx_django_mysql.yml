@@ -1,0 +1,100 @@
+version: "3.4"
+
+services:
+    nginx.atti:
+        image: nginx
+        restart: always
+        volumes:
+            - web-nginx-conf:/etc/nginx
+            - web-static:/static
+        ports:
+            - "80:80"
+        expose:
+            - "44380"
+	deploy:
+		mode: replicated
+		replicas: 3
+		placement:
+			max_replicas_per_node: 1
+		restart_policy:
+			condition: on-failure
+			failure_action: rollbask
+		labels:
+			nginx.atti.test
+		resources:
+			limits:
+				cpus: '0.90'
+				memory: 1000M
+		endpoint_mode: vip
+
+    django.atti:
+        image: continuumio/miniconda3
+        expose:
+            - "8000"
+        networks:
+            - atti-net
+        volumes:
+            - web-django:/opt/src/django
+            - web-static:/opt/src/django/static
+        entrypoint: /opt/src
+        command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --daemon
+	deploy:
+		mode: replicated
+		replicas: 2
+		update_config:
+			parallelism: 2
+			delay: 10s
+		placement:
+			max_replicas_per_node: 1
+		restart_policy:
+			condition: on-failure
+			failure_action: rollbask
+		labels:
+			django.atti.test
+		resources:
+			limits:
+				cpus: '0.50'
+				memory: 500M
+		endpoint_mode: vip
+
+    mysql.atti:
+        image: mysql
+	restart: always
+        networks:
+            - atti-net
+        expose:
+            - "3306"
+        volumes:
+            - data-mysql-atti:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: 'db_atti'
+            MYSQL_ROOT_PASSWORD: "attipasswd"
+        command:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+	deploy:
+		mode: replicated
+		replicas: 3
+		update_config:
+			parallelism: 2
+			delay: 10s
+		placement:
+			max_replicas_per_node: 1
+		restart_policy:
+			condition: on-failure
+			failure_action: rollbask
+		labels:
+			django.atti.test
+		resources:
+			limits:
+				cpus: '0.30'
+				memory: 500M
+		endpoint_mode: vip
+
+networks:
+    atti-net:
+
+volumes:
+    web-django:
+    web-static:
+    data-mysql-atti:

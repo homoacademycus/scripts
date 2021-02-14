@@ -1,0 +1,17 @@
+version: "3.4"
+
+services:
+  spark-base:
+    image: ubuntu
+    volumes:
+      - /opt/src/spark/config/scripts:/tempcfg
+    command:
+      - "sh /tempcfg/install_all.sh"
+    networks:
+      - hdfs-net
+    expose:
+      - "9000"
+      - "7077"
+    ports:
+      - "9870:9870"
+      - "8088:8088"

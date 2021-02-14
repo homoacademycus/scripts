@@ -1,0 +1,40 @@
+version: "3.4"
+
+services:
+    nginx.atti:
+        image: nginx
+        restart: always
+        volumes:
+            - web-nginx-conf:/etc/nginx
+            - web-static:/static
+        ports:
+            - "80:80"
+        expose:
+            - "44380"
+
+    django.atti:
+        image: continuumio/miniconda3
+        expose:
+            - "8000"
+        volumes:
+            - web-django:/django
+            - web-static:/django/static
+        entrypoint: /django
+        command: 
+            - pip install django gunicorn
+            - conda install mysqlclient
+            - gunicorn config.wsgi:application --bind 0.0.0.0:8000 --daemon
+
+    mysql.atti:
+        image: mysql
+        restart: always
+        expose:
+            - "3306"
+        volumes:
+            - data-mysql-atti:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: 'db_atti'
+            MYSQL_ROOT_PASSWORD: "attipasswd"
+        command:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci

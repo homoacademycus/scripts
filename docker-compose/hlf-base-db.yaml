@@ -1,0 +1,20 @@
+# Depends on the hyperledger/fabric-peer image.
+version: "2"
+networks:
+  hlf-net:
+
+services:
+  couchdb-base:
+    image: couchdb:latest
+    expose:
+      - ${COUCH_PORT}
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PSWD=${COUCHDB_PSWD}
+
+  mongo-base:
+    image: working_db:latest
+    networks:
+      - hlf-net
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
