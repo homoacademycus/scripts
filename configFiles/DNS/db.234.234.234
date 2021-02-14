@@ -1,0 +1,12 @@
+; BIND reverse data file for local net "234.234.234.x"
+;
+$TTL    604800
+@       IN      SOA     ns.server.atti. root.server.atti. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      ns.
+234       IN      PTR     ns.server.atti.

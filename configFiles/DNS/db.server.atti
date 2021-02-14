@@ -1,0 +1,15 @@
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     server.atti. root.server.atti. (
+                              3         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      ns.server.atti
+@       IN      A       234.234.234.234
+ns      IN      A       234.234.234.234
+@       IN      AAAA    ::1
+

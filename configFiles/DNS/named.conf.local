@@ -1,0 +1,13 @@
+zone "server.atti" {
+
+    type master;
+    file "/etc/bind/db.server.atti";
+
+};
+zone "234.234.234.in-addr.arpa" {
+
+    type master;
+    file "/etc/bind/db.234.234.234";
+
+};
+
