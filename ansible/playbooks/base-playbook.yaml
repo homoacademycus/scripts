@@ -1,0 +1,9 @@
+- hosts: localhost
+  tasks:
+    - name: test
+      shell: echo "hello world"
+
+- hosts: test-target
+  tasks:
+    - name: test
+      shell: echo "hello world"  

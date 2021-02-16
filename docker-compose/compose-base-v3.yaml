@@ -1,94 +1,83 @@
-version: "3.8"
+version: "3.8" #도커 배포판에 따라 버전이 다름
+dns: #커스텀 DNS서버
+	    - 8.8.8.8
+	    - 192.168.100.1
+
+dns_search: #커스텀 DNS 검색도메인
+	    - example.com
+
+networks: #같은 컴포즈 서비스 스택내 구동시 $COMPOSE_PROJECT_NAME이 net이름 앞에 붙음
+      backend-net: #서비스 스택 내 별도의 IP주소 대역을 가진 네트워크
+      frontend-net: #외부에 노출할 네트워크주소
+        external: true
+
+volumes: #호스트의 볼륨을 서비스처럼 정의 가능. 스웜모드에서 자동생성됨
+  cfg:
+  mysqldata:
+    external: true # 컴포즈에 없는 외부 서비스에서 생성된 named 볼륨
+  static:
+
 services:
 
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379"
-    networks:
-      - frontend
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 2
-        delay: 10s
-      restart_policy:
-        condition: on-failure
+  <서비스명>:
+    image: django #기존에 있는 이미지를 쓸 때
 
-  db:
-    image: postgres:9.4
+    build: #이미지를 새로 빌드할 때. docker-compose build 명령어 사용
+      shm_size: '2GB' # 빌드를 위한 /dev/shm 파티션 크기
+  	  context: ./build # 빌드 경로
+      dockerfile: test-dockerbuild # 빌드 설정파일
+
+    networks:
+      - frontend-net
+      - backend-net
+
+    external_links: # 다른 스택의 서비스와 연결 -스웜모드에서는 무시
+      - <외부 서비스명1>	# networks 중 하나를 공유해야
+
+    expose: # 호스트에 노출하지않고, linked 서비스들에만 노출
+      - "80"
+      - "8080"
+    
+    ports: # 호스트와 연결할 포트
+      - "8000:8000"
+
     volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - backend
-    deploy:
-      placement:
-        max_replicas_per_node: 1
-        constraints:
-          - "node.role==manager"
+      - static:/src/app/static
+      - mysqldata:/data
 
-  vote:
-    image: dockersamples/examplevotingapp_vote:before
-    ports:
-      - "5000:80"
-    networks:
-      - frontend
-    depends_on:
-      - redis
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 2
-      restart_policy:
-        condition: on-failure
-
-  result:
-    image: dockersamples/examplevotingapp_result:before
-    ports:
-      - "5001:80"
-    networks:
-      - backend
-    depends_on:
-      - db
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 2
-        delay: 10s
-      restart_policy:
-        condition: on-failure
-
-  worker:
-    image: dockersamples/examplevotingapp_worker
-    networks:
-      - frontend
-      - backend
-    deploy:
+    deploy: #인스턴스로 배포할 때
       mode: replicated
-      replicas: 1
-      labels: [APP=VOTING]
+	replicas: 2 # 복제할 인스턴스수
+      update_config:
+        parallelism: 2
+        delay: 10s
+      placement:
+        max_replicas_per_node: 1        
       restart_policy:
         condition: on-failure
-        delay: 10s
-        max_attempts: 3
-        window: 120s
-      placement:
-        constraints:
-          - "node.role==manager"
+        failure_action: rollback     
+      labels:
+        com.example.description: "이 서비스의 모든 인스턴스에 라벨링"  
+      resources:
+        limits:
+          cpus: '0.50' #싱글코어의 프로세싱타임*0.5만 사용
+          memory: 50M #메모리
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      endpoint_mode: vip # client가 서비스를 탐색하는 방법(가상IP)
+                         # 라운드로빈-DNS로 도메인 조회시 dnsrr로 설정 
+	  
+    entrypoint: /opt/src #컨테이너 접속시 프롬프트의 디폴트경로
 
-  visualizer:
-    image: dockersamples/visualizer:stable
-    ports:
-      - "8080:8080"
-    stop_grace_period: 1m30s
-    deploy:
-      placement:
-        constraints:
-          - "node.role==manager"
+    command: # 명령어
 
-networks:
-  frontend:
-  backend:
-
-volumes:
-  db-data:
+    env_file: #기존의 environments 대신 파일에 환경변수들을 저장
+	    - ./common.env
+	    - ./apps/myweb.env
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k" #로그파일 사이즈 제한
+        max-file: "10" #로그파일 개수 제한
