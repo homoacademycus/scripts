@@ -1,0 +1,12 @@
+
+FROM centos
+MAINTAINER homoacademycus
+
+ADD ../bash/install_mysql.sh /tmp/install_mysql.sh
+RUN /bin/sh /tmp/install_mysql.sh
+
+# Adding this will expose mysql on a random host port. recommended to avoid.
+#EXPOSE 3306
+
+CMD ["/usr/sbin/mysqld"]
+

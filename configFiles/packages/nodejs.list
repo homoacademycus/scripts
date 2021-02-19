@@ -1,0 +1,16 @@
+# webserver
+express
+koa koa-router koa-static koa-bodyparser
+
+# common
+axios
+brcypt
+jsonwebtoken
+dotenv
+joi
+
+# db
+mongoose
+
+
+

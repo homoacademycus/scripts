@@ -32,7 +32,7 @@ services:
       - backend-net
 
     external_links: # 다른 스택의 서비스와 연결 -스웜모드에서는 무시
-      - <외부 서비스명1>	# networks 중 하나를 공유해야
+              - <외부 서비스명1>	# networks 중 하나를 공유해야
 
     expose: # 호스트에 노출하지않고, linked 서비스들에만 노출
       - "80"

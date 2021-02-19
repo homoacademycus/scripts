@@ -1,0 +1,112 @@
+- name: change user (ansiblesu)
+  set_fact:
+    ansible_user: ansiblesu
+
+- name: install compile library
+  shell: "sudo yum install -y gcc gcc-c++"
+
+- name: change user (ansible)
+  set_fact:
+    ansible_user: ansible
+
+- name: delete source dir & file
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+  - "{{ path_nginx_source_dir }}"
+  - "{{ download_home }}/{{ file_nginx }}.tar.gz"
+  - "{{ download_home }}/{{ file_openssl }}.tar.gz"
+  - "{{ download_home }}/{{ file_pcre }}.tar.gz"
+  - "{{ download_home }}/{{ file_zlib }}.tar.gz"
+
+- name: Directory exists (nginx)
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+  - "{{ download_home }}"
+  - "{{ path_nginx_source_dir }}"
+  - "{{ path_nginx_home }}/conf/conf.d"
+  - "{{ path_nginx_home }}/ssl"
+  - "{{ path_nginx_log }}"
+
+- name: Downloading NGINX sources
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+  with_items:
+  - { id: 1, url: "{{ file_server_url }}/{{ file_nginx }}.tar.gz", dest: "{{ download_home }}/{{ file_nginx }}.tar.gz" }
+  - { id: 2, url: "{{ file_server_url }}/{{ file_openssl }}.tar.gz", dest: "{{ download_home }}/{{ file_openssl }}.tar.gz" }
+  - { id: 3, url: "{{ file_server_url }}/{{ file_pcre }}.tar.gz", dest: "{{ download_home }}/{{ file_pcre }}.tar.gz" }
+  - { id: 4, url: "{{ file_server_url }}/{{ file_zlib }}.tar.gz", dest: "{{ download_home }}/{{ file_zlib }}.tar.gz" }
+  register: nginx_source
+
+- name: Unpacking NGINX
+  unarchive:
+    src: "{{ nginx_source.results.0.dest }}"
+    dest: "{{ path_nginx_source_dir }}"
+    extra_opts: [--strip-components=1]
+    remote_src: "yes"
+  when: nginx_source is changed
+  register: nginx_source_unpack
+
+- name: Extract archive (openssl)
+  unarchive:
+    src: "{{ nginx_source.results.1.dest }}"
+    dest: "{{ path_nginx_source_dir }}/"
+    remote_src: "yes"
+
+- name: Extract archive (pcre)
+  unarchive:
+    src: "{{ nginx_source.results.2.dest }}"
+    dest: "{{ path_nginx_source_dir }}/"
+    remote_src: "yes"
+
+- name: Extract archive (zlib)
+  unarchive:
+    src: "{{ nginx_source.results.3.dest }}"
+    dest: "{{ path_nginx_source_dir }}/"
+    remote_src: "yes"
+
+- name: Configuring NGINX source with custom modules
+  command: "./configure --with-pcre=./{{ file_pcre }} --with-zlib=./{{ file_zlib }} --with-openssl={{ file_openssl }} --with-http_ssl_module --with-http_realip_module --prefix={{ path_nginx_home }} --user=ansible --group=ansible"
+  args:
+    chdir: "{{ path_nginx_source_dir }}"
+  when: nginx_source_unpack is changed
+  register: nginx_configure
+
+- name: Installing NGINX
+  shell: make && make install
+  args:
+    chdir: "{{ path_nginx_source_dir }}"
+  when: nginx_configure is changed
+
+- name: change user (ansiblesu)
+  set_fact:
+    ansible_user: ansiblesu
+
+- name: CAP_NET_BIND_SERVICE
+  command: "sudo /usr/sbin/setcap CAP_NET_BIND_SERVICE=+eip {{ path_nginx_home }}/sbin/nginx"
+
+- name: change user (ansible)
+  set_fact:
+    ansible_user: ansible
+
+- name: delete source dir & file
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+  - "{{ path_nginx_source_dir }}"
+  - "{{ download_home }}/{{ file_nginx }}.tar.gz"
+  - "{{ download_home }}/{{ file_openssl }}.tar.gz"
+  - "{{ download_home }}/{{ file_pcre }}.tar.gz"
+  - "{{ download_home }}/{{ file_zlib }}.tar.gz"
+  - "{{ path_nginx_home }}/logs"
+
+- name: symbolic link (log)
+  file:
+    src: "{{ path_nginx_log }}"
+    dest: "{{ path_nginx_home }}/logs"
+    state: links

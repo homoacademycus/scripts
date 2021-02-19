@@ -1,0 +1,19 @@
+FROM centos
+MAINTAINER homoacademycus
+
+RUN mkdir -p /opt/webapp
+RUN cd /opt/webapp
+WORKDIR /opt/webapp
+
+ADD ../bash/install_npm.sh /opt/webapp/install_npm.sh
+ADD ../bash/install_koa.sh /opt/webapp/install_koa.sh
+RUN /bin/sh /opt/webapp/install_npm.sh
+RUN /bin/sh /opt/webapp/install_koa.sh
+
+ADD ../configFiles/packages/npm.prettierrc /opt/webapp/.prettierrc
+ADD ../configFiles/packages/react.eslintrc.json /opt/webapp/.eslintrc.json
+
+RUN groupadd -g 42424 developer
+RUN useradd -r -u 42424 -g developer developer
+USER developer
+

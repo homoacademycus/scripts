@@ -3,7 +3,20 @@
     - name: test
       shell: echo "hello world"
 
-- hosts: test-target
+- hosts: webservers
+  remote_user: ansiblecenter
+  become: yes
+  become_method: sudo
+  
+  vars:
+    worgkingdir: /statics
   tasks:
-    - name: test
-      shell: echo "hello world"  
+    - name: Install nginx web server
+      yum: name=nginx state=latest
+      notify:
+        - restart nginx
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+
+

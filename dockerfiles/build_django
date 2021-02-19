@@ -1,0 +1,13 @@
+FROM centos
+
+RUN yum update
+RUN yum install -y git
+RUN yum install -y python3.8
+RUN ln -s /usr/bin/python3.8 /usr/bin/python3
+RUN pip3 install 
+
+RUN groupadd -g 42424 developer
+RUN useradd -r -u 42424 -g developer developer
+USER developer
+
+WORKDIR /opt/webapp

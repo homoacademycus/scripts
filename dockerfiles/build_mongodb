@@ -1,0 +1,8 @@
+FROM ubuntu
+MAINTAINER homoacademycus
+
+ADD ../bash/install_mongodb.sh /tmp/install_mongodb.sh
+RUN /bin/sh /tmp/install_mongodb.sh
+
+ADD ../configFiles/db/mongod.conf  /etc/mongod.conf
+CMD ["/usr/bin/mongod", "--config", "/etc/mongod.conf"] 
