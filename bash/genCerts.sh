@@ -1,3 +1,8 @@
+#!/bin/sh
+#
+# Copyright homoacademycus@github.com
+# MIT Licnese
+#
 echo "
 **** default ssl cert dir ****
 linux : /etc/ssl/certs
@@ -12,7 +17,7 @@ if [ -d "$certdir" ]; then
     rm -rf $certdir/*
 fi
 if [ ! -d "$certdir" ]; then
-    mkdir $certdir
+    mkdir -p $certdir
 fi
 ls $certdir
 echo -n "set valid days :"

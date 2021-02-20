@@ -1,3 +1,6 @@
+# Copyright homoacademycus@github.com
+# MIT Licnese
+#
 version: "3.8" #도커 배포판에 따라 버전이 다름
 dns: #커스텀 DNS서버
 	    - 8.8.8.8
