@@ -1,26 +1,44 @@
-#!/bin/bash
+#!/bin/sh
+
+path_current_dir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
+echo "current dir path is : $path_current_dir"
 
 while true;
 do
 echo -n "
 **** root permission required ****
+0. terminate
 1. initialize with daemon.json, seccomp.json
 2. enable tls with openssl
 3. container's resource
-4. set proxy
+4. set proxy(deprecated)
 **********************************
-select number:"
+--> select number:"
 read op
 
 case "$op" in
+0)
+    break
+    ;;
 1)
-    cp ../configFiles/container/dockerd.cfg /etc/docker/daemon.json
-    cp ../configFiles/container/seccomp_default.json /etc/docker/seccomp.json
+    cp $path_current_dir/../configFiles/container/dockerd.cfg /etc/docker/daemon.json
+    cp $path_current_dir/../configFiles/container/seccomp_default.json /etc/docker/seccomp.json
+    echo "--> /etc/docker/daemon.json"
+    head /etc/docker/daemon.json
+    echo "--> /etc/docker/seccomp.json"
+    head /etc/docker/seccomp.json
     ;;
 2)
-    openssl ~/.docker/ca.pem
-    openssl ~/.docker/cert.pem
-    openssl ~/.docker/key.pem
+    . $path_current_dir/genCerts.sh
+    echo -n "set my tls private key file:"
+    read myprivkey
+    echo -n "set my tls cert file:"
+    read mycert
+    echo -n "set tls ca server cert file:"
+    read cacert
+    dockerd --tlskey /home/$USERNAME/.docker/$myprivkey
+    dockerd --tlscert /home/$USERNAME/.docker/$mycert
+    dockerd --tlscacert /home/$USERNAME/.docker/$cacert
     dockerd --tlsverify
     ;;
 3)
@@ -38,7 +56,7 @@ case "$op" in
     ;;
 4)
     mkdir -p /etc/systemd/system/docker.service.d
-    cp ../configFiles/container/dockerd_http-proxy.cfg /etc/systemd/system/docker.service.d/http-proxy.conf
+    cp $path_current_dir/../configFiles/container/dockerd_http-proxy.cfg /etc/systemd/system/docker.service.d/http-proxy.conf
     systemctl daemon-reload
     systemctl restart docker
     systemctl show docker
@@ -47,7 +65,7 @@ case "$op" in
     echo "$op is invalid. please enter to continue.."
     read enterKey
     ;;
-   esac
+esac
 done
 
 
