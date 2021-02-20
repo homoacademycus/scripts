@@ -1,9 +1,17 @@
-git config --global user.email "$1"
-git config --global user.name "$2"
+echo -n "set user email :"
+read email
+echo -n "set user name :"
+read name
+
+git config --global user.email $email
+git config --global user.name $name
 git remote -v
 
-git remote add origin $3
-git remote set-url origin $3
+echo -n "set remote repository address :"
+read addr
+
+git remote add origin $addr
+git remote set-url origin $addr
 
 git add ./*
 git commit -m `date +%Y-%m-%d`

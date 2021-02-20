@@ -1,1 +1,14 @@
+FROM centos
+MAINTAINER homoacademycus
 
+RUN yum install -y git
+ADD ../bash/install_python3.sh /opt/webapp/install_python3.sh
+ADD ../configFiles/packages/pip.jupyter.list /tmp/pip.jupyter.list
+RUN /bin/sh /opt/webapp/install_python3.sh
+RUN pip3 install -r /tmp/pip.jupyter.list
+
+ADD ../bash/docker_container_user.sh /tmp/docker_container_user.sh
+RUN /bin/sh /tmp/docker_container_user.sh
+
+# modify here
+USER developer
