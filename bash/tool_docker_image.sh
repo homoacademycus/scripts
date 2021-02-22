@@ -21,6 +21,7 @@ case $op in
 0)
     echo "finish this program.."
     break
+    ;;
 1)
     docker ps -a
     echo -n "enter docker container ID to save: "  
@@ -32,16 +33,19 @@ case $op in
     ;;
 2)
     docker images
-    echo -n "enter docker image file name: "
+    echo -n "enter docker image file name :"
     read name
-    docker save $name | gzip -c 1> ./images/$name.tgz
+    echo -n "enter dir path to save docker image into :"
+    read imagedir
+    docker save $name | gzip -c 1> $imagedir/$name.tgz
     echo "stored docker image into gzip file.."
     ;;
 3)
-    ls ./images
+    echo -n "enter dir path to load docker image from :"
+    ls $imagedir
     echo -n "enter gzip filename to load :"
     read imagefilename
-    gunzip -c ./images/$imagefilename | docker load
+    gunzip -c $imagedir/$imagefilename | docker load
     echo "loaded gzip file into docker image.."
     ;;
 4)

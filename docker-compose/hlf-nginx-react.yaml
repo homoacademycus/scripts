@@ -11,8 +11,13 @@ services:
     networks:
       - front-net
     ports:
-      - 80:80
+        - ${PORT_HTTPS}:${PORT_HTTPS}
     expose:
-      - ${CA_PORT}
+        - ${PORT_NGINX}
     environment:
       - FABRIC_CA_HOME=${FABRIC_CA_HOME}
+    volumes:
+        - web-nginx-conf:/etc/nginx
+        - web-static:/static
+
+

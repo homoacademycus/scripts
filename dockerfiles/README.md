@@ -24,12 +24,10 @@ docker images
 docker image tag oldImageName:tag newImageName:tag
 ```
 imageName:tag would not get set when there is an error in the build.
-<<<<<<< HEAD
 
 6. installation
 - interactive shell will cause error : must put -y option on package installation
 - correct misspelling
 - when use ADD command, all files must be in the dockerfile context dir
 - change user at final
-=======
->>>>>>> 231affda8088b47bc8a6f0a2afce91c6a96c7ecd
+

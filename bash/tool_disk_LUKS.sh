@@ -24,7 +24,7 @@ echo -n "
 6. close LUKS disk (clear device mapper)
 7. change LUKS password
 ***************************************
---> enter number(0~5) : "
+--> enter number(0~7) : "
 read op
 
 case $op in
@@ -72,13 +72,7 @@ case $op in
     ls /dev/mapper | grep $luksDeviceName
     ;;
 7)
-    sudo cryptsetup luksChangeKey \
-	    --cipher aes-xts-plain64 \
-	    --key-size 512 \
-	    --hash sha512 \
-	    --use-random \
-	    --verify-passphrase $luksDisk \
-        --verbose
+    sudo cryptsetup luksChangeKey $luksDisk
     ;;
 *)
   echo "please enter to continue.."
