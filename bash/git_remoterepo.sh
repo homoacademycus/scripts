@@ -47,5 +47,5 @@ git remote add origin $remoteurl
 git remote set-url origin $remoteurl
 git remote -v
 git add ./*
-git commit -m 'initialized'
+git commit -m 'set remote repo..'
 git push --set-upstream origin master

@@ -42,9 +42,10 @@ case $op in
     ;;
 3)
     echo -n "enter dir path to load docker image from :"
+    read imagedir
     ls $imagedir
     echo -n "enter gzip filename to load :"
-    read imagefilename
+    read imagefilename    
     gunzip -c $imagedir/$imagefilename | docker load
     echo "loaded gzip file into docker image.."
     ;;

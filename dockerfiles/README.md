@@ -30,4 +30,3 @@ imageName:tag would not get set when there is an error in the build.
 - correct misspelling
 - when use ADD command, all files must be in the dockerfile context dir
 - change user at final
-

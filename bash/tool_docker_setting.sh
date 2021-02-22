@@ -36,10 +36,10 @@ case "$op" in
     read mycert
     echo -n "set tls ca server cert file:"
     read cacert
-    dockerd --tlskey /home/$USERNAME/.docker/$myprivkey
-    dockerd --tlscert /home/$USERNAME/.docker/$mycert
-    dockerd --tlscacert /home/$USERNAME/.docker/$cacert
-    dockerd --tlsverify
+    sudo dockerd --tlskey /home/$USERNAME/.docker/$myprivkey
+    sudo dockerd --tlscert /home/$USERNAME/.docker/$mycert
+    sudo dockerd --tlscacert /home/$USERNAME/.docker/$cacert
+    sudo dockerd --tlsverify
     ;;
 3)
     docker ps -a
@@ -55,11 +55,11 @@ case "$op" in
         --memory $memory --memory-swap $totalmemory $container
     ;;
 4)
-    mkdir -p /etc/systemd/system/docker.service.d
-    cp $path_current_dir/../configFiles/container/dockerd_http-proxy.cfg /etc/systemd/system/docker.service.d/http-proxy.conf
-    systemctl daemon-reload
-    systemctl restart docker
-    systemctl show docker
+    sudo mkdir -p /etc/systemd/system/docker.service.d
+    sudo cp $path_current_dir/../configFiles/container/dockerd_http-proxy.cfg /etc/systemd/system/docker.service.d/http-proxy.conf
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
+    sudo systemctl show docker
     ;;
 *) 
     echo "$op is invalid. please enter to continue.."
