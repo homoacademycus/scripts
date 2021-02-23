@@ -1,45 +1,89 @@
-
 version: 2
 networks:
-    atti-net:
+    frontend-net:
+        external: true
+    backend-net:
+volumes:
+    web-static:
+    data-mongo:
 services:
-    nginx.atti:
-        image: nginx
-        restart: always
+    react-nginx:
+        image: react-nginx:base
+        read_only: true
+        tmpfs:
+            - /tmp
         volumes:
-            - web-nginx-conf:/etc/nginx
-            - web-static:/static
+            - web-static:${NGINX_STATIC_DIR}:ro
+        networks:
+            - frontend-net
         ports:
-            - "80:80"
+            - ${PORT_HTTP}:${PORT_HTTP}
+            - ${PORT_HTTPS}:${PORT_HTTPS}
         expose:
-            - "44380"
+            - ${PORT_NGINX}
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        user: react
+        group_add:
+            - containersGroup #to rw on same Host File(소유권한 그룹)
+        privileged: false
 
-    django.atti:
-        image: continuumio/miniconda3
-        expose:
-            - "8000"
-        networks:
-            - atti-net
+    nodeweb:
+        image: nodeweb:base
+        read_only: true
+        tmpfs:
+            - /tmp
         volumes:
-            - web-django:/opt/src/django
-            - web-static:/opt/src/django/static
-        entrypoint: /opt/src
-        command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --daemon
+            - web-static:${NODEWEB_STATIC_DIR}:ro
+        networks:
+            - backend-net
+        ports:
+            - ${PORT_HTTP}:${PORT_HTTP}
+            - ${PORT_HTTPS}:${PORT_HTTPS}
+        expose:
+            - ${PORT_NGINX}
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        user: nodeweb
+        group_add:
+            - containersGroup #to rw on same Host File(소유권한 그룹)
+        privileged: false
 
-    mysql.atti:
-        image: mysql
-	    restart: always
+    mongodb:
+        image: mongo:latest
         networks:
-            - atti-net
+            - backend-net
         expose:
-            - "3306"
+            - ${PORT_MONGO}
+        read_only: true
+        tmpfs:
+            - /tmp
         volumes:
-            - data-mysql-atti:/var/lib/mysql
+            - data-mongo:${MONGO_DATA_DIR}:ro
         environment:
-            MYSQL_DATABASE: 'db_atti'
-            MYSQL_ROOT_PASSWORD: "attipasswd"
-        command:
-            - --character-set-server=utf8mb4
-            - --collation-server=utf8mb4_unicode_ci
+            MYSQL_DATABASE: ${MYSQL_USER}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWD}
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        user: mongo
+        group_add:
+            - containersGroup #to rw on same Host File(소유권한 그룹)
+        privileged: false
+
 
 

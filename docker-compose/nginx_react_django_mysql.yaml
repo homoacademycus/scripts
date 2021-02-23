@@ -1,42 +1,85 @@
 version: 2
 networks:
-    atti-net:
+    frontend-net:
+        external: true
+    backend-net:
+volumes:
+    web-static:
+    data-mysql:
 services:
-    nginx.atti:
-        image: nginx
-        restart: always
+    react-nginx:
+        image: react-nginx:base
+        read_only: true
         volumes:
-            - web-nginx-conf:/etc/nginx
-            - web-static:/static
-        ports:
-            - "80:80"
-        expose:
-            - "44380"
-
-    django.atti:
-        image: continuumio/miniconda3
-        expose:
-            - "8000"
+            - web-static:${NGINX_STATIC_DIR}:rw
         networks:
-            - atti-net
+            - frontend-net
+        ports:
+            - ${PORT_HTTP}:${PORT_HTTP}
+            - ${PORT_HTTPS}:${PORT_HTTPS}
+        expose:
+            - ${PORT_NGINX}
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        user: react
+        group_add:
+            - containersGroup #to rw on same Host File(소유권한 그룹)
+        privileged: false
+
+    django:
+        image: django:base
+        expose:
+            - ${PORT_DJANGO}
+        networks:
+            - backend-net
         volumes:
-            - web-django:/opt/src/django
-            - web-static:/opt/src/django/static
-        entrypoint: /opt/src
+            - web-static:${DJANGO_STATIC_DIR}:ro
+            #- web-static:${DJANGO_STATIC_DIR}:rw
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        user: django
+        group_add:
+            - containersGroup #to rw on same Host File(소유권한 그룹)
+        privileged: false
         command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --daemon
 
-    mysql.atti:
-        image: mysql
-	    restart: always
+    mysql:
+        image: mysql:latest
         networks:
-            - atti-net
+            - backend-net
         expose:
-            - "3306"
+            - ${PORT_MYSQL}
+        read_only: true
+        tmpfs:
+            - ${MYSQL_RUNTIME_DIR}:uid=${CONTAINER_UID},gid=${CONTAINER_GID}
+            - /tmp
         volumes:
-            - data-mysql-atti:/var/lib/mysql
+            #- data-mysql:${MYSQL_DATA_DIR}:rw
+            - data-mysql:${MYSQL_DATA_DIR}:ro
         environment:
-            MYSQL_DATABASE: 'db_atti'
-            MYSQL_ROOT_PASSWORD: "attipasswd"
+            MYSQL_DATABASE: ${MYSQL_USER}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWD}
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        user: mysql
+        group_add:
+            - containersGroup #to rw on same Host File(소유권한 그룹)
+        privileged: false
         command:
             - --character-set-server=utf8mb4
             - --collation-server=utf8mb4_unicode_ci
