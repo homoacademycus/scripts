@@ -9,12 +9,11 @@ djangorestframework
 django-rest-swagger
 django-cors-headers
 
-<<<<<<< HEAD
+
+django-redis
+pymongo
 #mysqlclient
-=======
-mysqlclient
->>>>>>> 231affda8088b47bc8a6f0a2afce91c6a96c7ecd
-#elasticsearch-dsl
+elasticsearch-dsl
 
 #swagger
 #pyinstaller

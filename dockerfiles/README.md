@@ -27,6 +27,4 @@ imageName:tag would not get set when there is an error in the build.
 
 6. installation
 - interactive shell will cause error : must put -y option on package installation
-- correct misspelling
-- when use ADD command, all files must be in the dockerfile context dir
-- change user at final
+- WORKDIR is root of relative path
