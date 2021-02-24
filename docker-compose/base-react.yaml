@@ -7,7 +7,6 @@ networks:
 
 volumes:
     web-static:
-    react-workdir:
 
 services:
     react-develop:
@@ -18,7 +17,7 @@ services:
             dockerfile: build_react
         volumes:
             - ${HOST_WORK_DIR}/reactapp:${REACT_WORK_DIR}
-            - ${HOST_WORK_DIR}/web-static:${REACT_STATIC_DIR}
+            - web-static:${REACT_STATIC_DIR}
         networks:
             - frontend-net
             - backend-net
@@ -32,12 +31,16 @@ services:
         expose:
             - ${PORT_NGINX}
         cap_drop:
-          - ALL
+            - ALL
+#            - MAC_ADMIN
+#            - NET_ADMIN
+#            - SYS_ADMIN
         cap_add:
-          - NET_BIND_SERVICE
+#            - ALL
+            - NET_BIND_SERVICE
         working_dir: ${REACT_WORK_DIR}
-        entrypoint: /bin/bash
-        command: npm start
+        entrypoint: ${REACT_WORF_DIR}
+        command: ['npm','start']
 
 
 

@@ -24,8 +24,8 @@ services:
         cap_add:
           - NET_BIND_SERVICE
         working_dir: ${JUPYTER_DATA_DIR}
-        entrypoint: /bin/bash
-        command: npm start
+        entrypoint: ${JUPYTER_DATA_DIR}
+        command: ["jupyter","lab","--port","${PORT_JUPYTER}","--no-browser", "&"]
 
     jupyter-develop:
         extends: jupyter-base
@@ -57,4 +57,4 @@ services:
             - jupyter-product:${JUPYTER_DATA_DIR}
             - jupyter-product:${JUPYTER_RUNTIME_DIR}
         working_dir: ${JUPYTER_DATA_DIR}
-        entrypoint: /bin/bash
+        entrypoint: ${JUPYTER_DATA_DIR}

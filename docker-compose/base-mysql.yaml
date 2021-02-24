@@ -5,6 +5,7 @@ networks:
 
 volumes:
     web-static:
+    data-mysql:
 
 services:
     mysql-base:
@@ -16,7 +17,7 @@ services:
         environment:
             MYSQL_DATABASE: ${MYSQL_USER}
             MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWD}
-        working_dir: ${REACT_WORK_DIR}
+        working_dir: ${MYSQL_DATA_DIR}
         command:
             - --character-set-server=utf8mb4
             - --collation-server=utf8mb4_unicode_ci
@@ -60,4 +61,4 @@ services:
             - mysql-product:${MYSQL_CFG_DIR}
             - mysql-product:${MYSQL_RUNTIME_DIR}
         working_dir: ${MYSQL_DATA_DIR}
-        entrypoint: /bin/bash
+        entrypoint: ${MYSQL_DATA_DIR}

@@ -32,4 +32,7 @@ imageName:tag would not get set when there is an error in the build.
 7. docker-compose file
 - use dockerfile only for installing packages which needs root permision
 - possible to set build option in docker-compose file
-- don't waste your time with stric dockerfile rules
+- don't waste your time with strict dockerfile rules
+
+8. entry point
+- Entrypoint can't point to /bin/bash

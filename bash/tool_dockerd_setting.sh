@@ -10,10 +10,9 @@ echo -n "
 0. terminate
 1. initialize with daemon.json, seccomp.json
 2. enable tls with openssl
-3. container's resource
-4. set proxy(deprecated)
+3. set proxy(deprecated)
 **********************************
---> select number:"
+--> select number(0~3):"
 read op
 
 case "$op" in
@@ -41,20 +40,8 @@ case "$op" in
     sudo dockerd --tlscacert /home/$USERNAME/.docker/$cacert
     sudo dockerd --tlsverify
     ;;
+
 3)
-    docker ps -a
-    echo -n "enter container name:"
-    read container
-    echo -n "set cpu usage in percentage(0.0~1.0) :"
-    read cpu_percentage
-    echo -n "set memory usage(ex. 1g) :"
-    read memory
-    echo -n "set total memory and swap usage(ex. 5g) :"
-    read totalmemory
-	docker update --cpus $cpu_percentage \
-        --memory $memory --memory-swap $totalmemory $container
-    ;;
-4)
     sudo mkdir -p /etc/systemd/system/docker.service.d
     sudo cp $path_current_dir/../configFiles/container/dockerd_http-proxy.cfg /etc/systemd/system/docker.service.d/http-proxy.conf
     sudo systemctl daemon-reload

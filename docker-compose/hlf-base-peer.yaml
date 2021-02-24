@@ -1,0 +1,43 @@
+# Depends on the hyperledger/fabric-peer image.
+version: "2"
+
+services:
+  peer-base:
+    image: hyperledger/fabric-peer:${HLF_VERSION}
+    expose:
+      - "7050" # Rest
+      - "7051" # Peer Grpc( gossip )
+      - "7052" # Peer CLI( chaincode,channel,log.. )
+      - "7053" # Peer Event
+      - "7054" # eCAP
+      - "7055" # eCAA
+      - "7056" # tCAP
+      - "7057" # eCAA
+      - "7058" # tlsCAP
+      - "7059" # tlsCAA
+    environment:
+      - FABRIC_LOGGING_SPEC=${FABRIC_LOGGING_SPEC}
+      - GODEBUG=netdns=go+1
+      #- CORE_VM_ENDPOINT=unix:///host${DOCKER_SOCKET} #mutual-TLS
+      - CORE_VM_ENDPOINT=unix://${DOCKER_SOCKET} #default
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_test
+      - CORE_CHAINCODE_BUILDER=hyperledger/fabric-ccenv:${HLF_VERSION}
+      #- CORE_PEER_NETWORKID=dev
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:${PEER_GOSSIP_PORT}
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:${PEER_CLI_PORT}
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true # dynamic gossip-leader-selection
+      - CORE_PEER_GOSSIP_ORGLEADER=false # participate in gossip-leader-selection?
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=${FABRIC_CFG_PATH}/node-home/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=${FABRIC_CFG_PATH}/node-home/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=${FABRIC_CFG_PATH}/node-home/tls/ca.crt
+      - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+      #- CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      #- CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${COUCHDB_USER}
+      #- CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${COUCHDB_PSWD}
+    volumes:
+      #- /var/run/:/host/var/run/ #mutual-TLS
+      - ${DOCKER_SOCKET}:${DOCKER_SOCKET} # default
+    working_dir: ${FABRIC_CFG_PATH}
+    command: peer node start

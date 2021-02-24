@@ -22,8 +22,8 @@ services:
         cap_add:
           - NET_BIND_SERVICE
         working_dir: ${NODEWEB_WORK_DIR}
-        entrypoint: /bin/bash
-        command: npm start
+        entrypoint: ${NODEWEB_WORK_DIR}
+        command: ["npm","start"]
 
     nodeweb-develop:
         extends: nodeweb-base
@@ -61,5 +61,5 @@ services:
         volumes_from:
             - nodeweb-product:${NODEWEB_WORK_DIR}
         working_dir: ${NODEWEB_WORK_DIR}
-        entrypoint: /bin/bash
+        entrypoint: ${NODEWEB_WORK_DIR}
 
