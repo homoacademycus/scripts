@@ -1,0 +1,88 @@
+version: "2"
+
+networks:
+    data-net:
+
+volumes:
+    hdfs-datanode:
+    hdfs-namenode:
+    hdfs-hosts:
+    hdfs-log:
+    hdfs-log-app:
+
+# HDFS 데몬 : NameNode, SecondaryNameNode, DataNode
+# YARN 데몬 : ResourceManager, NodeManager, WebAppProxy
+# HDFS container must be run as root : sshd_config.permitRootLogin=true
+
+services:
+    hdfs-base:
+        image: hdfs:centos7
+        build:
+            shm_size: '1GB'
+            context: ../dockerfiles/in-docker-compose
+            dockerfile: build_hdfs
+        cap_drop:
+            - ALL
+        cap_add:
+            - NET_BIND_SERVICE
+        networks:
+            - data-net
+        expose:
+            - "9000"
+            - "7077"
+            - "8021"
+        ports:
+            - ${PORT_HDFS_NAMENODE_WEB_UI}:${PORT_HDFS_NAMENODE_WEB_UI}
+            - ${PORT_YARN_RESOURCE_MANAGER_WEB_UI}:${PORT_YARN_RESOURCE_MANAGER_WEB_UI}
+            - ${PORT_HDFS_HISTORY_SERVER_WEB_UI}:${PORT_HDFS_HISTORY_SERVER_WEB_UI}
+        environment:
+            - JAVA_HOME=${JAVA_HOME}
+            - HADOOP_HOME=${HADOOP_HOME}
+            - HADOOP_CONFIG_HOME=${HADOOP_HOME}/etc/hadoop
+            - SPARK_HOME=${SPARK_HOME}
+        working_dir: ${HDFS_WORK_DIR}
+        entryporint: "export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$JAVA_HOME/bin"
+
+    hdfs-namenode:
+        extends: hdfs-base
+        environment:
+            - HDFS_NAMENODE_USER="root"
+            - HDFS_DATANODE_USER="root"
+            - HDFS_SECONDARYNAMENODE_USER="root"
+            - YARN_RESOURCEMANAGER_USER="root"
+            - YARN_NODEMANAGER_USER="root"
+        volumes:
+            - hdfs-namenode:${HDFS_NAMENODE_HOME}
+            - hdfs-hosts:${HADOOP_HOME}/etc/hadoop/workers
+        command: 
+            - ${HADOOP_HOME}/bin/hdfs --daemon start namenode
+            - ${HADOOP_HOME}/bin/mapred --daemon start historyserver
+            - ${HADOOP_HOME}/bin/yarn --daemon start resourcemanager
+            - ${HADOOP_HOME}/bin/yarn --daemon start nodemanager
+            - ${HADOOP_HOME}/bin/yarn --daemon start proxymanager
+
+    hdfs-datanode:
+        extends: hdfs-base
+        volumes:
+            - hdfs-datanode:${HDFS_DATANODE_HOME}
+            - hdfs-log:${HDFS_DATANODE_HOME}/log
+            - hdfs-log-app:${HDFS_DATANODE_HOME}/applog
+        command: 
+            - "${HADOOP_HOME}/bin/hdfs --daemon start datanode"
+
+    hdfs-helper:
+        image: ubuntu:latest
+        tty: true
+        networks:
+            - data-net
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        volumes_from:
+            - hdfs-namenode:${HDFS_NAMENODE_HOME}
+            - hdfs-datanode:${HDFS_DATANODE_HOME}
+            - hdfs-datanode:${HDFS_DATANODE_HOME}/log
+            - hdfs-datanode:${HDFS_DATANODE_HOME}/applog
+        working_dir: ${NODEWEB_WORK_DIR}
+        entrypoint: ${NODEWEB_WORK_DIR}

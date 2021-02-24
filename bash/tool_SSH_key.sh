@@ -1,7 +1,6 @@
 #!/bin/sh
 #
-# Copyright homoacademycus@github.com
-# MIT Licnese
+# Copyright homoacademycus@github.com | MIT Licnese
 #
 sshkey_dir="/home/$USERNAME/.ssh"
 

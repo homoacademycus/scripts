@@ -1,0 +1,54 @@
+version: "2"
+
+networks:
+    data-net:
+
+volumes:
+    hdfs-datanode:
+    hdfs-namenode:
+    hdfs-log:
+    hdfs-log-app:
+
+x-deploy:
+    &deploy-default
+    mode: replicated
+        replicas: 3
+    update_config:
+        parallelism: 2
+    restart_policy:
+        condition: on-failure
+        failure_action: rollback
+    resources:
+        limits:
+          cpus: '0.25'
+          memory: 3g
+          memory-swap: 4g
+    endpoint_mode: vip
+
+# namenode 가 datanode의 IP 주소를 overlay network 에 기반해 기록하므로
+# 외부 IP 대역에서 HDFS-client 가 datanote에 rw 작업을 요청했을 때 접근불가
+services:
+  master:
+    restart: always
+    extends:
+      file: base-spark.yaml
+      service: spark-namenode
+    deploy:
+      << : *deploy_default
+    command:
+        - "${HADOOP_HOME}/bin/hdfs namenode -format "
+
+  slave:
+    restart: always
+    extends:
+      file: base-spark.yaml
+      service: spark-datanode
+    logging:
+      driver: "json-file"
+    deploy:
+        << : *deploy_default
+        resources:
+            limits:
+                cpus: '0.25'
+                memory: 1g
+                memory-swap: 2g

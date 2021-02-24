@@ -8,67 +8,53 @@ volumes:
     web-static:
     data-mysql:
 
+x-deploy:
+    &deploy-default
+    mode: replicated
+        replicas: 3
+    update_config:
+        parallelism: 2
+    restart_policy:
+        condition: on-failure
+        failure_action: rollback
+    resources:
+        limits:
+          cpus: '0.25'
+          memory: 3g
+          memory-swap: 4g
+    endpoint_mode: vip
+
 services:
     nginx-react:
         extends:
           file: base-nginx.yaml
           service: nginx-product
 	    deploy:
-		    mode: replicated
-		    replicas: 3
-		    update_config:
-			    parallelism: 2
-			    delay: 10s
-		    placement:
-			    max_replicas_per_node: 3
-		    restart_policy:
-			    condition: on-failure
-			    failure_action: rollbask
-		    resources:
-			    limits:
-				    cpus: '0.50'
-				    memory: 500M
-		    endpoint_mode: vip
+          << : *deploy_default
+        resources:
+		    limits:
+			    cpus: '0.50'
+			    memory: 500M
 
     django:
         extends:
           file: base-django.yaml
           service: django-product
 	    deploy:
-		    mode: replicated
-		    replicas: 3
-		    update_config:
-			    parallelism: 2
-			    delay: 10s
-		    placement:
-			    max_replicas_per_node: 3
-		    restart_policy:
-			    condition: on-failure
-			    failure_action: rollbask
-		    resources:
-			    limits:
-				    cpus: '1.00'
-				    memory: 1000M
-		    endpoint_mode: vip
+          << : *deploy_default
+        resources:
+		    limits:
+			    cpus: '1.00'
+			    memory: 1000M
 
     mysql:
         extends:
           file: base-mysql.yaml
           service: mysql-product
 	    deploy:
-		    mode: replicated
-		    replicas: 3
-		    update_config:
-			    parallelism: 2
-			    delay: 10s
-		    placement:
-			    max_replicas_per_node: 3
-		    restart_policy:
-			    condition: on-failure
-			    failure_action: rollbask
-		    resources:
-			    limits:
-				    cpus: '1.00'
-				    memory: 500M
-		    endpoint_mode: vip
+          << : *deploy_default
+        resources:
+		    limits:
+			    cpus: '1.00'
+			    memory: 1000M
 
