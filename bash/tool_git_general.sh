@@ -54,11 +54,11 @@ case $op in
     ;;
 4)
     git add ./*
-    git commit -m `date +%Y-%m-%d`
-    git pull
-    git add ./*
     echo -n "add commit message:"
     read message
+    git commit -m "`date +%Y-%m-%d`/$message"
+    git pull
+    git add ./*
     git commit -m "`date +%Y-%m-%d`/$message"
     git push
     ;;
