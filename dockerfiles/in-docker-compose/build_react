@@ -26,4 +26,4 @@ RUN npm install -y react react-dom react-router-dom react-app react-scripts
 RUN npm install -y styled-components prop-types
 RUN npm install -y axios brcypt jsonwebtoken axios gh-pages
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["npm","start"]

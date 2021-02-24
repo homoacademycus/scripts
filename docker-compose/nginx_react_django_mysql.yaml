@@ -17,11 +17,6 @@ x-deploy:
     restart_policy:
         condition: on-failure
         failure_action: rollback
-    resources:
-        limits:
-          cpus: '0.25'
-          memory: 3g
-          memory-swap: 4g
     endpoint_mode: vip
 
 services:
@@ -30,31 +25,34 @@ services:
           file: base-nginx.yaml
           service: nginx-product
 	    deploy:
-          << : *deploy_default
-        resources:
-		    limits:
-			    cpus: '0.50'
-			    memory: 500M
+            << : *deploy_default
+            resources:
+    		    limits:
+    			    cpus: '0.50'
+    			    memory: 2000M
+                    memory-swap: 4g
 
     django:
         extends:
           file: base-django.yaml
           service: django-product
 	    deploy:
-          << : *deploy_default
-        resources:
-		    limits:
-			    cpus: '1.00'
-			    memory: 1000M
+            << : *deploy_default
+            resources:
+	    	    limits:
+	    		    cpus: '1.00'
+	    		    memory: 2000M
+                    memory-swap: 4g
 
     mysql:
         extends:
           file: base-mysql.yaml
           service: mysql-product
 	    deploy:
-          << : *deploy_default
-        resources:
-		    limits:
-			    cpus: '1.00'
-			    memory: 1000M
+            << : *deploy_default
+            resources:
+		        limits:
+			        cpus: '1.00'
+    			    memory: 2000M
+                    memory-swap: 6g
 

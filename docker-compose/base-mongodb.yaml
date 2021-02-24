@@ -17,14 +17,16 @@ services:
             - backend-net
         expose:
             - ${PORT_MONGO}
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
 
     mongodb-develop:
         extends: mongodb-base
         tty: true
+        cap_drop:
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
+        cap_add:
+            - ALL
         external_links:
             - django-develop
             - nodeweb-develop
@@ -37,6 +39,10 @@ services:
         read_only: true
         privileged: false
         user: mysql
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
         security_opt:
           #- label:user:USERNAME #labeling scheme for each container
           #- label:role:ROLENAME #labeling scheme for each container

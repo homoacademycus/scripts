@@ -1,3 +1,4 @@
+
 version: "2" # v3 does not support 'extends' yet
 
 networks:
@@ -19,16 +20,18 @@ services:
             - backend-net
         expose:
             - ${PORT_DJANGO}
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
         working_dir: ${DJANGO_WORK_DIR}
         entrypoint: ${DJANGO_WORK_DIR}
 
     django-develop:
         extends: django-base
         tty: true
+        cap_drop:
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
+        cap_add:
+            - ALL
         volumes:
             - ${HOST_WORK_DIR}/djangoapp:${DJANGO_WORK_DIR}
         command: 
@@ -40,6 +43,10 @@ services:
         tty: false
         read_only: true
         privileged: false
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
 #        security_opt:
 #          - label:user:USERNAME #labeling scheme for each container
 #          - label:role:ROLENAME #labeling scheme for each container
@@ -62,9 +69,11 @@ services:
         expose:
             - ${PORT_DJANGO}
         cap_drop:
-          - ALL
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
         cap_add:
-          - NET_BIND_SERVICE
+            - ALL
         tty: true
         volumes_from:
             - django-product:${DJANGO_CFG_DIR}

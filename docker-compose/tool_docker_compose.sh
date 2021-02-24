@@ -6,11 +6,16 @@
 echo "please locate this script file under dir with docker-compose file"
 path_current_dir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
 echo -n "---->> this script is exected under dir : $path_current_dir"
-echo "\n `ls .`"
+echo "\n `ls $path_current_dir`"
+
 echo -n "set docker compose file name(example.yaml) :"
 read filename
 echo -n "set log level(debug for develop, info for production) :"
 read level
+
+echo "---->> copy env to .env"
+cp $path_current_dir/env $path_current_dir/.env
+head $path_current_dir/.env
 
 while true;
 do

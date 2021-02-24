@@ -1,0 +1,28 @@
+
+FROM nginx:latest
+
+# to proxy-pass
+ARG port
+
+# to get SSL from Let's encrypt
+ARG domain
+ARG email
+
+RUN apt-get update && apt-get install software-properties-common -y && add-apt-repository ppa:certbot/certbot
+RUN apt-get install -y \
+    python-certbot-nginx \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ADD nginx.conf /root/nginx.conf
+ADD ./scripts/set_nginx_reverse_proxy.sh /root/set_nginx_reverse_proxy.sh
+ADD ./scripts/setup-ssl.sh /root/setup-ssl.sh
+
+WORKDIR /root
+
+# change reverse-proxy setting
+RUN ./set_nginx_reverse_proxy.sh $domain $port
+RUN ./setup-ssl.sh $domain $email
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -17,10 +17,6 @@ services:
             - backend-net
         expose:
             - ${PORT_WEB_APP}
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
         working_dir: ${NODEWEB_WORK_DIR}
         entrypoint: ${NODEWEB_WORK_DIR}
         command: ["npm","start"]
@@ -28,6 +24,12 @@ services:
     nodeweb-develop:
         extends: nodeweb-base
         tty: true
+        cap_drop:
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
+        cap_add:
+            - ALL
         volumes:
             - ${HOST_WORK_DIR}/nodeapp:${NODEWEB_WORK_DIR}
             - ${HOST_WORK_DIR}/web-static:${NODEWEB_STATIC_DIR}
@@ -38,6 +40,10 @@ services:
         read_only: true
         privileged: false
         user: nodeweb
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
         group_add:
             - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
 #        security_opt:
@@ -55,9 +61,11 @@ services:
         expose:
             - ${PORT_WEB_APP}
         cap_drop:
-          - ALL
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
         cap_add:
-          - NET_BIND_SERVICE
+            - ALL
         volumes_from:
             - nodeweb-product:${NODEWEB_WORK_DIR}
         working_dir: ${NODEWEB_WORK_DIR}

@@ -31,15 +31,13 @@ services:
         expose:
             - ${PORT_NGINX}
         cap_drop:
-            - ALL
-#            - MAC_ADMIN
-#            - NET_ADMIN
-#            - SYS_ADMIN
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
         cap_add:
-#            - ALL
-            - NET_BIND_SERVICE
+            - ALL
         working_dir: ${REACT_WORK_DIR}
-        entrypoint: ${REACT_WORF_DIR}
+        entrypoint: ${REACT_WORK_DIR}
         command: ['npm','start']
 
 

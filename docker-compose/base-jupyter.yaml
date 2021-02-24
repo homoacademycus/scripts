@@ -29,6 +29,12 @@ services:
 
     jupyter-develop:
         extends: jupyter-base
+        cap_drop:
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
+        cap_add:
+            - ALL
         volumes:
             - ${HOST_WORK_DIR}/jupyter/cfg:${JUPYTER_CFG_GLOBAL_DIR}:rw
             - ${HOST_WORK_DIR}/jupyter/data:${JUPYTER_DATA_DIR}:rw
@@ -36,6 +42,10 @@ services:
 
     jupyter-product:
         extends: jupyter-base
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
         volumes:
             - jupyter-cfg:${JUPYTER_CFG_GLOBAL_DIR}:ro
             - jupyter-data:${JUPYTER_DATA_DIR}:rw
@@ -44,9 +54,11 @@ services:
     jupyter-helper:
         image: ubuntu:latest
         cap_drop:
-          - ALL
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
         cap_add:
-          - NET_BIND_SERVICE
+            - ALL
         tty: true
         networks:
             - backend-net

@@ -29,16 +29,18 @@ services:
             - ${PORT_HTTPS}:${PORT_HTTPS}
         expose:
             - ${PORT_NGINX}
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
         working_dir: ${NGINX_CFG_DIR}
         entrypoint: ${NGINX_CFG_DIR}
 
     nginx-develop:
         extends: nginx-base
         tty: true
+        cap_drop:
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
+        cap_add:
+            - ALL
         group_add:
             - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
         volumes:
@@ -54,6 +56,10 @@ services:
         read_only: true
         privileged: false
         user: nginx
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
         volumes:
             - ${NGINX_CFG_DIR}
             - ${NGINX_LOG_DIR}
@@ -63,9 +69,11 @@ services:
     nginx-helper:
         image: ubuntu:latest
         cap_drop:
-          - ALL
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
         cap_add:
-          - NET_BIND_SERVICE
+            - ALL
         networks:
             - frontend-net
         expose:
