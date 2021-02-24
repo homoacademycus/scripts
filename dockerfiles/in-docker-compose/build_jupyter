@@ -1,0 +1,8 @@
+FROM centos:7
+MAINTAINER homoacademycus
+
+RUN yum install -y git
+RUN yum install -y python3
+RUN pip3 install -r jupyter
+
+ENTRYPOINT ["/bin/bash"]

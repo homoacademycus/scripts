@@ -10,7 +10,7 @@ RUN useradd --system --uid ${appuserid} --gid ${appuser} ${appuser}
 RUN gpasswd --restrict ${appuser}
 
 RUN mkdir -p ${workingdir}
-ADD pip.django.list ${workingdir}/pip.django.list
+COPY pip.django.list ${workingdir}/pip.django.list
 RUN chown -R ${appuser} ${workingdir}
 RUN chmod -R 775 ${workingdir}
 WORKDIR ${workingdir}

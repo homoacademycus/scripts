@@ -1,0 +1,63 @@
+version: "2" # v3 does not support 'extends' yet
+
+networks:
+    backend-net:
+
+volumes:
+    web-static:
+
+services:
+    mysql-base:
+        image: mysql:latest
+        networks:
+            - backend-net
+        expose:
+            - ${PORT_MYSQL}
+        environment:
+            MYSQL_DATABASE: ${MYSQL_USER}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWD}
+        workdir: ${REACT_WORK_DIR}
+        command:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+
+    mysql-develop:
+        extends: nodeweb-base
+        tty: true
+        volumes:
+            - ${HOST_WORK_DIR}/data/mysql:${MYSQL_DATA_DIR}
+
+    mysql-product:
+        extends: nodeweb-base
+        tty: false
+        read_only: true
+        privileged: false
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        user: mysql
+        tmpfs:
+            #- ${MYSQL_RUNTIME_DIR}:uid=${CONTAINER_UID},gid=${CONTAINER_GID}
+            - /tmp
+        volumes:
+            - data-mysql:${MYSQL_DATA_DIR}:ro
+            - ${MYSQL_CFG_DIR}
+            - ${MYSQL_RUNTIME_DIR}
+
+    mysql-helper:
+        image: ubuntu:latest
+        networks:
+            - backend-net
+        expose:
+            - ${PORT_MYSQL}
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        tty: true
+        volumes_from:
+            - mysql-product:${MYSQL_DATA_DIR}:rw
+            - mysql-product:${MYSQL_CFG_DIR}:ro
+            - mysql-product:${MYSQL_RUNTIME_DIR}:ro
+        workdir: ${MYSQL_DATA_DIR}
+        entrypoint: /bin/bash

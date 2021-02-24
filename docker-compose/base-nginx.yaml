@@ -1,0 +1,77 @@
+version: "2" # v3 does not support 'extends' yet
+
+networks:
+    frontend-net:
+        external: true
+    backend-net:
+
+volumes:
+    web-static:
+    nginx-cfg:
+
+services:
+    nginx-base:
+        image: nginx:centos7
+        build:
+            shm_sie: '1GB'
+            context: ../dockerfiles/in-docker-compose
+            dockerfile: build_nginx
+        networks:
+            - frontend-net
+            - backend-net
+        external_links:
+            - nodeweb
+            - django
+            - jupyter
+            - elastic
+        ports:
+            - ${PORT_HTTP}:${PORT_HTTP}
+            - ${PORT_HTTPS}:${PORT_HTTPS}
+        expose:
+            - ${PORT_NGINX}
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        workdir: ${REACT_WORK_DIR}
+        entrypoint: /bin/bash
+        command: npm start
+
+    nginx-develop:
+        extends: nginx-base
+        tty: true
+        group_add:
+            - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
+        volumes:
+            - ${HOST_WORK_DIR}/nginx:${NGINX_CFG_DIR}
+            - ${HOST_WORK_DIR}/web-static:${NGINX_STATIC_DIR}
+
+    nginx-product:
+        extends: nginx-base
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        tty: false
+        read_only: true
+        privileged: false
+        user: nginx
+        volumes:
+            - ${NGINX_CFG_DIR}
+            - web-static:${NGINX_STATIC_DIR}
+
+    nginx-helper:
+        image: ubuntu:latest
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        networks:
+            - frontend-net
+        expose:
+            - ${PORT_NGINX}
+        tty: true
+        volumes_from:
+            - nginx-product:${NGINX_CFG_DIR}:rw
+            - nginx-product:${NGINX_CONTENT_DIR}:rw
+        workdir: ${NGINX_CFG_DIR}
+        entrypoint: /bin/bash

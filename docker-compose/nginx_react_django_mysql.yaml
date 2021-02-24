@@ -3,85 +3,72 @@ networks:
     frontend-net:
         external: true
     backend-net:
+
 volumes:
     web-static:
     data-mysql:
+
 services:
-    react-nginx:
-        image: react-nginx:base
-        read_only: true
-        volumes:
-            - web-static:${NGINX_STATIC_DIR}:rw
-        networks:
-            - frontend-net
-        ports:
-            - ${PORT_HTTP}:${PORT_HTTP}
-            - ${PORT_HTTPS}:${PORT_HTTPS}
-        expose:
-            - ${PORT_NGINX}
-        security_opt:
-          #- label:user:USERNAME #labeling scheme for each container
-          #- label:role:ROLENAME #labeling scheme for each container
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
-        user: react
-        group_add:
-            - containersGroup #to rw on same Host File(소유권한 그룹)
-        privileged: false
+    nginx-react:
+        extends:
+          file: base-nginx.yaml
+          service: nginx-product
+	    deploy:
+		    mode: replicated
+		    replicas: 3
+		    update_config:
+			    parallelism: 2
+			    delay: 10s
+		    placement:
+			    max_replicas_per_node: 3
+		    restart_policy:
+			    condition: on-failure
+			    failure_action: rollbask
+		    resources:
+			    limits:
+				    cpus: '0.50'
+				    memory: 500M
+		    endpoint_mode: vip
 
     django:
-        image: django:base
-        expose:
-            - ${PORT_DJANGO}
-        networks:
-            - backend-net
-        volumes:
-            - web-static:${DJANGO_STATIC_DIR}:ro
-            #- web-static:${DJANGO_STATIC_DIR}:rw
-        security_opt:
-          #- label:user:USERNAME #labeling scheme for each container
-          #- label:role:ROLENAME #labeling scheme for each container
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
-        user: django
-        group_add:
-            - containersGroup #to rw on same Host File(소유권한 그룹)
-        privileged: false
-        command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --daemon
+        extends:
+          file: base-django.yaml
+          service: django-product
+	    deploy:
+		    mode: replicated
+		    replicas: 3
+		    update_config:
+			    parallelism: 2
+			    delay: 10s
+		    placement:
+			    max_replicas_per_node: 3
+		    restart_policy:
+			    condition: on-failure
+			    failure_action: rollbask
+		    resources:
+			    limits:
+				    cpus: '1.00'
+				    memory: 1000M
+		    endpoint_mode: vip
 
     mysql:
-        image: mysql:latest
-        networks:
-            - backend-net
-        expose:
-            - ${PORT_MYSQL}
-        read_only: true
-        tmpfs:
-            - ${MYSQL_RUNTIME_DIR}:uid=${CONTAINER_UID},gid=${CONTAINER_GID}
-            - /tmp
-        volumes:
-            #- data-mysql:${MYSQL_DATA_DIR}:rw
-            - data-mysql:${MYSQL_DATA_DIR}:ro
-        environment:
-            MYSQL_DATABASE: ${MYSQL_USER}
-            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWD}
-        security_opt:
-          #- label:user:USERNAME #labeling scheme for each container
-          #- label:role:ROLENAME #labeling scheme for each container
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
-        user: mysql
-        group_add:
-            - containersGroup #to rw on same Host File(소유권한 그룹)
-        privileged: false
-        command:
-            - --character-set-server=utf8mb4
-            - --collation-server=utf8mb4_unicode_ci
-
+        extends:
+          file: base-mysql.yaml
+          service: mysql-product
+	    deploy:
+		    mode: replicated
+		    replicas: 3
+		    update_config:
+			    parallelism: 2
+			    delay: 10s
+		    placement:
+			    max_replicas_per_node: 3
+		    restart_policy:
+			    condition: on-failure
+			    failure_action: rollbask
+		    resources:
+			    limits:
+				    cpus: '1.00'
+				    memory: 500M
+		    endpoint_mode: vip
 

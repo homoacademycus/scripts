@@ -1,0 +1,11 @@
+FROM centos:7
+MAINTAINER homoacademycus
+
+RUN yum install -y git
+RUN yum install -y python3
+
+RUN pip3 install -y uvicorn gunicorn
+RUN pip3 install -y django djangorestframework django-rest-swagger django-cors-headers
+RUN pip3 install -y django-redis pymongo elasticsearch-dsl
+
+ENTRYPOINT ["/bin/bash"]

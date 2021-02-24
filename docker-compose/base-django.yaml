@@ -1,0 +1,75 @@
+version: "2" # v3 does not support 'extends' yet
+
+networks:
+    backend-net:
+
+volumes:
+    web-static:
+
+services:
+    django-base:
+        image: django:centos7
+        build:
+            shm_sie: '1GB'
+            context: ../dockerfiles/in-docker-compose
+            dockerfile: build_django        
+        environment:
+            DJANGO_WORK_DIR: ${DJANGO_WORK_DIR}
+        networks:
+            - backend-net
+        expose:
+            - ${PORT_DJANGO}
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        workdir: ${DJANGO_WORK_DIR}
+        entrypoint: /bin/bash
+
+    django-develop:
+        extends: django-base
+        tty: true
+        volumes:
+            - ${HOST_WORK_DIR}/djangoapp:${DJANGO_WORK_DIR}
+        command: 
+            - "django-admin runserver --settings=config.django.debug" #개발용 test서버
+            #- "django-admin runserver --settings=config.django.deploy" #배포용 test서버
+
+    django-product:
+        extends: django-base
+        tty: false
+        read_only: true
+        privileged: false
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        user: django
+        group_add:
+            - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
+        volumes:
+            - ${DJANGO_CFG_DIR}
+            - ${DJANGO_LOG_DIR}
+            - ${DJANGO_STATIC_DIR}
+            - web-static:${DJANGO_STATIC_DIR}:ro
+        commands:
+            #- "gunicorn -w 4 -k uvicorn.workers.UvicornWorker" #asgi서버
+            - "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT_DJANGO}" #wsgi서버
+
+    django-helper:
+        image: ubuntu:latest
+        networks:
+            - backend-net
+        expose:
+            - ${PORT_DJANGO}
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        tty: true
+        volumes_from:
+            - django-product:${DJANGO_CFG_DIR}:rw
+            - django-product:${DJANGO_STATIC_DIR}:ro
+            - django-product:${DJANGO_LOG_DIR}:ro
+        workdir: ${DJANGO_WORK_DIR}
+        entrypoint: /bin/bash ${DJANGO_WORK_DIR}
+

@@ -1,0 +1,65 @@
+version: "2" # v3 does not support 'extends' yet
+
+networks:
+    backend-net:
+
+volumes:
+    web-static:
+
+services:
+    nodeweb-base:
+        image: nodeweb:centos7
+        build:
+            shm_sie: '1GB'
+            context: ../dockerfiles/in-docker-compose
+            dockerfile: build_nodeweb
+        networks:
+            - backend-net
+        expose:
+            - ${PORT_WEB_APP}
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        workdir: ${NODEWEB_WORK_DIR}
+        entrypoint: /bin/bash
+        command: npm start
+
+    nodeweb-develop:
+        extends: nodeweb-base
+        tty: true
+        volumes:
+            - ${HOST_WORK_DIR}/nodeapp:${NODEWEB_WORK_DIR}
+            - ${HOST_WORK_DIR}/web-static:${NODEWEB_STATIC_DIR}
+
+    nodeweb-product:
+        extends: nodeweb-base
+        tty: false
+        read_only: true
+        privileged: false
+        user: nodeweb
+        group_add:
+            - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
+        security_opt:
+          #- label:user:USERNAME #labeling scheme for each container
+          #- label:role:ROLENAME #labeling scheme for each container
+        volumes:
+            - ${NODEWEB_WORK_DIR}
+            - web-static:${NODEWEB_STATIC_DIR}:ro
+
+    nodeweb-helper:
+        image: ubuntu:latest
+        tty: true
+        networks:
+            - backend-net
+        expose:
+            - ${PORT_WEB_APP}
+        cap_drop:
+          - ALL
+        cap_add:
+          - NET_BIND_SERVICE
+        volumes_from:
+            - nodeweb-product:${NODEWEB_WORK_DIR}:rw
+        workdir: ${NODEWEB_WORK_DIR}
+        entrypoint: /bin/bash
+

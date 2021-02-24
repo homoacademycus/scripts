@@ -1,6 +1,3 @@
-# Copyright homoacademycus@github.com
-# MIT Licnese
-#
 version: "3.8" #도커 배포판에 따라 버전이 다름
 dns: #커스텀 DNS서버
 	    - 8.8.8.8
@@ -14,7 +11,7 @@ networks: #같은 컴포즈 서비스 스택내 구동시 $COMPOSE_PROJECT_NAME�
       frontend-net: #외부에 노출할 네트워크주소
         external: true
 
-volumes: #호스트의 볼륨을 서비스처럼 정의 가능. 스웜모드에서 자동생성됨
+volumes: # can be reused across multiple services, without relying on volumes_from
   cfg:
   mysqldata:
     external: true # 컴포즈에 없는 외부 서비스에서 생성된 named 볼륨
@@ -22,20 +19,42 @@ volumes: #호스트의 볼륨을 서비스처럼 정의 가능. 스웜모드에�
 
 services:
 
-  <서비스명>:
+  서비스명:
     image: django #기존에 있는 이미지를 쓸 때
 
-    build: #이미지를 새로 빌드할 때. docker-compose build 명령어 사용
+    build: #docker-compose build 서비스명. tagged as projectName_serviceName
       shm_size: '2GB' # 빌드를 위한 /dev/shm 파티션 크기
   	  context: ./build # 빌드 경로
       dockerfile: test-dockerbuild # 빌드 설정파일
+      args: # allocate value to ARG vars in Dockerfiles
+        - buildno=1
+        - gitcommithash=cdc3b19
+      labels: # metadata to the resulting image
+        com.example.description: "Accounting webapp"
+        com.example.department: "Finance"
+        com.example.label-with-empty-value: ""
+
+    security_opt:
+      - label:user:USERNAME #labeling scheme for each container
+      - label:role:ROLENAME #labeling scheme for each container
+
+    cap_drop:
+      - ALL
+
+    cap_add:
+      - NET_ADMIN
+
+    user: username
+    group_add:
+        - containersGroup #to rw on same Host File(소유권한 그룹)
+    privileged: false
 
     networks:
       - frontend-net
       - backend-net
 
     external_links: # 다른 스택의 서비스와 연결 -스웜모드에서는 무시
-              - <외부 서비스명1>	# networks 중 하나를 공유해야
+      - externalService	# networks 중 하나를 공유해야
 
     expose: # 호스트에 노출하지않고, linked 서비스들에만 노출
       - "80"
@@ -45,11 +64,31 @@ services:
       - "8000:8000"
 
     volumes:
-      - static:/src/app/static
-      - mysqldata:/data
+      - /path/to/create/container/volume:rw
+      - /path/to/host/volume:/path/to/container/volume:rw
+      - topLevelVolume:/path/to/container/volume:ro
+
+    volumes_from: #Mount all of the volumes from another service/container
+      - another_service_name:ro
+      - another_container_name:container_name:rw
+
+    entrypoint: /opt/src #컨테이너 접속시 프롬프트의 디폴트경로
+
+    command: # 명령어
+
+    env_file: #기존의 environments 대신 파일에 환경변수들을 저장
+	    - ./common.env
+	    - ./apps/myweb.env
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k" #로그파일 사이즈 제한
+        max-file: "10" #로그파일 개수 제한
 
     deploy: #인스턴스로 배포할 때
       mode: replicated
+
 	replicas: 2 # 복제할 인스턴스수
       update_config:
         parallelism: 2
@@ -68,19 +107,6 @@ services:
         reservations:
           cpus: '0.25'
           memory: 20M
+
       endpoint_mode: vip # client가 서비스를 탐색하는 방법(가상IP)
                          # 라운드로빈-DNS로 도메인 조회시 dnsrr로 설정 
-	  
-    entrypoint: /opt/src #컨테이너 접속시 프롬프트의 디폴트경로
-
-    command: # 명령어
-
-    env_file: #기존의 environments 대신 파일에 환경변수들을 저장
-	    - ./common.env
-	    - ./apps/myweb.env
-    
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k" #로그파일 사이즈 제한
-        max-file: "10" #로그파일 개수 제한
