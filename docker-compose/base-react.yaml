@@ -13,7 +13,7 @@ services:
     react-develop:
         image: react:centos7
         build:
-            shm_sie: '1GB'
+            shm_size: '1GB'
             context: ../dockerfiles/in-docker-compose
             dockerfile: build_react
         volumes:
@@ -35,8 +35,9 @@ services:
           - ALL
         cap_add:
           - NET_BIND_SERVICE
-        workdir: ${REACT_WORK_DIR}
+        working_dir: ${REACT_WORK_DIR}
         entrypoint: /bin/bash
         command: npm start
+
 
 

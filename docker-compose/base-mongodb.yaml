@@ -10,7 +10,7 @@ services:
     mongodb-base:
         image: mongodb:centos7
         build:
-            shm_sie: '1GB'
+            shm_size: '1GB'
             context: ../dockerfiles/in-docker-compose
             dockerfile: build_mongodb
         networks:

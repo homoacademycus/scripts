@@ -1,8 +1,9 @@
 FROM centos:7
 MAINTAINER homoacademycus
 
+RUN yum install -y epel-release
 RUN yum install -y git
-RUN yum install npm
+RUN yum install -y nodejs
 
 RUN npm cache clean -f
 RUN npm install -g n

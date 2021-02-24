@@ -1,11 +1,19 @@
 FROM centos:7
 MAINTAINER homoacademycus
 
+RUN yum install -y epel-release
 RUN yum install -y git
 RUN yum install -y python3
 
-RUN pip3 install -y uvicorn gunicorn
-RUN pip3 install -y django djangorestframework django-rest-swagger django-cors-headers
-RUN pip3 install -y django-redis pymongo elasticsearch-dsl
+# install pip3 with root permission is not good. use --user option
+RUN pip3 install uvicorn
+RUN pip3 install gunicorn
+RUN pip3 install django
+RUN pip3 install djangorestframework
+RUN pip3 install django-rest-swagger
+RUN pip3 install django-cors-headers
+RUN pip3 install django-redis
+RUN pip3 install pymongo
+RUN pip3 install elasticsearch-dsl
 
 ENTRYPOINT ["/bin/bash"]

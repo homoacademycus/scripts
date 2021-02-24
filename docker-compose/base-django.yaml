@@ -10,7 +10,7 @@ services:
     django-base:
         image: django:centos7
         build:
-            shm_sie: '1GB'
+            shm_size: '1GB'
             context: ../dockerfiles/in-docker-compose
             dockerfile: build_django        
         environment:
@@ -23,7 +23,7 @@ services:
           - ALL
         cap_add:
           - NET_BIND_SERVICE
-        workdir: ${DJANGO_WORK_DIR}
+        working_dir: ${DJANGO_WORK_DIR}
         entrypoint: /bin/bash
 
     django-develop:
@@ -40,9 +40,9 @@ services:
         tty: false
         read_only: true
         privileged: false
-        security_opt:
-          #- label:user:USERNAME #labeling scheme for each container
-          #- label:role:ROLENAME #labeling scheme for each container
+#        security_opt:
+#          - label:user:USERNAME #labeling scheme for each container
+#          - label:role:ROLENAME #labeling scheme for each container
         user: django
         group_add:
             - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
@@ -51,7 +51,7 @@ services:
             - ${DJANGO_LOG_DIR}
             - ${DJANGO_STATIC_DIR}
             - web-static:${DJANGO_STATIC_DIR}:ro
-        commands:
+        command:
             #- "gunicorn -w 4 -k uvicorn.workers.UvicornWorker" #asgi서버
             - "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT_DJANGO}" #wsgi서버
 
@@ -67,9 +67,9 @@ services:
           - NET_BIND_SERVICE
         tty: true
         volumes_from:
-            - django-product:${DJANGO_CFG_DIR}:rw
-            - django-product:${DJANGO_STATIC_DIR}:ro
-            - django-product:${DJANGO_LOG_DIR}:ro
-        workdir: ${DJANGO_WORK_DIR}
+            - django-product:${DJANGO_CFG_DIR}
+            - django-product:${DJANGO_STATIC_DIR}
+            - django-product:${DJANGO_LOG_DIR}
+        working_dir: ${DJANGO_WORK_DIR}
         entrypoint: /bin/bash ${DJANGO_WORK_DIR}
 

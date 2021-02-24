@@ -9,8 +9,9 @@ WORKDIR ${workingdir}
 COPY npm.prettierrc ${workingdir}/.prettierrc
 COPY react.eslintrc.json ${workingdir}/.eslintrc.json
 
+RUN yum install -y epel-release
 RUN yum install -y git
-RUN yum install npm
+RUN yum install -y nodejs
 
 RUN npm cache clean -f
 RUN npm install -g n
@@ -23,7 +24,6 @@ RUN npm install -y -g create-react-app
 RUN npm install -y -g --save-dev eslint prettier eslint-config-prettier
 RUN npm install -y react react-dom react-router-dom react-app react-scripts 
 RUN npm install -y styled-components prop-types
-RUN npm install -y axios react-redux redux-actions redux-sega
-RUN npm install -y brcypt jsonwebtoken axios gh-pages
+RUN npm install -y axios brcypt jsonwebtoken axios gh-pages
 
 ENTRYPOINT ["/bin/bash"]
