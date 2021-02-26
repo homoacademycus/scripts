@@ -19,7 +19,7 @@ services:
             - ${PORT_WEB_APP}
         working_dir: ${NODEWEB_WORK_DIR}
         entrypoint: ${NODEWEB_WORK_DIR}
-        command: ["npm","start"]
+        command: ["npm","run","start"]
 
     nodeweb-develop:
         extends: nodeweb-base
@@ -31,7 +31,7 @@ services:
         cap_add:
             - ALL
         volumes:
-            - ${HOST_WORK_DIR}/nodeapp:${NODEWEB_WORK_DIR}
+            - ${HOST_WORK_DIR}/nodeApp:${NODEWEB_WORK_DIR}
             - ${HOST_WORK_DIR}/web-static:${NODEWEB_STATIC_DIR}
 
     nodeweb-product:

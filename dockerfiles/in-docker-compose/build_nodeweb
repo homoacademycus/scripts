@@ -16,4 +16,4 @@ RUN npm install -g -y mongoose dotenv joi axios
 RUN npm init -y
 RUN eslint --init
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["npm","run","start"]

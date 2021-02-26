@@ -20,6 +20,7 @@ PORT_HTTPS=443
 PORT_SSH=22
 
 # PORT - SERVICE
+PORT_REACT=3000
 PORT_DJANGO=8000
 PORT_MYSQL=3306
 PORT_MONGO=27017
@@ -44,14 +45,14 @@ NGINX_CFG_DIR=/etc/nginx
 NGINX_LOG_DIR=/var/log/nginx/log
 NGINX_CONTENT_DIR=/usr/share/nginx/html
 NGINX_STATIC_DIR=/
-REACT_WORK_DIR=/reactapp
-REACT_STATIC_DIR=/reactapp/static
-DJANGO_WORK_DIR=/djangoapp
-DJANGO_CFG_DIR=/djangoapp/cfg
-DJANGO_LOG_DIR=/djangoapp/log
-DJANGO_STATIC_DIR=/djangoapp/static
-NODEWEB_WORK_DIR=/nodeapp
-NODEWEB_STATIC_DIR=/nodeapp/static
+REACT_WORK_DIR=/reactApp
+REACT_STATIC_DIR=/reactApp/static
+DJANGO_WORK_DIR=/djangoApp
+DJANGO_CFG_DIR=/djangoApp/cfg
+DJANGO_LOG_DIR=/djangoApp/log
+DJANGO_STATIC_DIR=/djangoApp/static
+NODEWEB_WORK_DIR=/nodeApp
+NODEWEB_STATIC_DIR=/nodeApp/static
 
 # CONTAINER VOLUME - DB
 MONGO_CFG_DIR=/
@@ -69,9 +70,10 @@ JUPYTER_CFG_DIR=~/.jupyter
 JUPYTER_DATA_DIR=~/.local/share/jupyter
 JUPYTER_RUNTIME_DIR=~/.local/share/jupyter/runtimes
 HADOOP_HOME=/hadoop_home/hadoop-3.2.1
+SPARK_HOME=/
 HDFS_DATANODE_HOME=/hdfs/datanode
 HDFS_NAMENODE_HOME=/hdfs/namenode
-SPARK_HOME=
+
 
 # FOR DEVELOP
 JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64

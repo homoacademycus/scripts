@@ -2,3 +2,12 @@
 # jquery
 https://cdnjs.cloudflare.com/ajax/libs/jquery/버전/jquery.min.js
 
+# react
+https://cdnjs.cloudflare.com/ajax/libs/react/버전/react.js, react-dom.js
+https://unpkg.com/react@16/umd/react.development.js
+https://unpkg.com/react-dom@16/umd/react-dom.development.js
+
+# babel
+https://unpkg.com/babel-standalone@6.26.0/babel.js
+https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0-alpha1/JSXTransformer.js
+https://cdnjs.cloudflare.com/ajax/libs/babel-core/버전/browser.min.js

@@ -18,11 +18,6 @@ x-deploy:
     restart_policy:
         condition: on-failure
         failure_action: rollback
-    resources:
-        limits:
-          cpus: '0.25'
-          memory: 3g
-          memory-swap: 4g
     endpoint_mode: vip
 
 # namenode 가 datanode의 IP 주소를 overlay network 에 기반해 기록하므로
@@ -35,6 +30,11 @@ services:
       service: spark-namenode
     deploy:
       << : *deploy_default
+        resources:
+            limits:
+              cpus: '1.00'
+              memory: 3g
+              memory-swap: 4g
     command:
         - "${HADOOP_HOME}/bin/hdfs namenode -format "
 
@@ -43,12 +43,10 @@ services:
     extends:
       file: base-spark.yaml
       service: spark-datanode
-    logging:
-      driver: "json-file"
     deploy:
         << : *deploy_default
         resources:
             limits:
-                cpus: '0.25'
+                cpus: '0.50'
                 memory: 1g
                 memory-swap: 2g

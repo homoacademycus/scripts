@@ -33,7 +33,7 @@ services:
         cap_add:
             - ALL
         volumes:
-            - ${HOST_WORK_DIR}/djangoapp:${DJANGO_WORK_DIR}
+            - ${HOST_WORK_DIR}/djangoApp:${DJANGO_WORK_DIR}
         command: 
             - "django-admin runserver --settings=config.django.debug" #개발용 test서버
             #- "django-admin runserver --settings=config.django.deploy" #배포용 test서버

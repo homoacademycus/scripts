@@ -1,0 +1,7 @@
+"files.watcherExclude": {
+  "**/dist/*/**": true,
+  "**/package-lock.json": true,
+  "**/vendor/*/**": true,
+  "**/yarn.lock": true,
+  "**/build/**": true
+}

@@ -10,13 +10,14 @@ volumes:
 
 services:
     react-develop:
-        image: react:centos7
+        image: react:base #centos7
         build:
             shm_size: '1GB'
             context: ../dockerfiles/in-docker-compose
             dockerfile: build_react
+        tty: true
         volumes:
-            - ${HOST_WORK_DIR}/reactapp:${REACT_WORK_DIR}
+            - ${HOST_WORK_DIR}/reactApp:${REACT_WORK_DIR}
             - web-static:${REACT_STATIC_DIR}
         networks:
             - frontend-net
@@ -26,8 +27,7 @@ services:
             - django
             - jupyter
         ports:
-            - ${PORT_HTTP}:${PORT_HTTP}
-            - ${PORT_HTTPS}:${PORT_HTTPS}
+            - ${PORT_REACT}:${PORT_REACT}
         expose:
             - ${PORT_NGINX}
         cap_drop:
@@ -37,8 +37,7 @@ services:
         cap_add:
             - ALL
         working_dir: ${REACT_WORK_DIR}
-        entrypoint: ${REACT_WORK_DIR}
-        command: ['npm','start']
-
+        entrypoint: "sleep 99999"
+#        command: ["npm","run","start"]
 
 

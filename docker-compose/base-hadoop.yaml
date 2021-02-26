@@ -10,8 +10,8 @@ volumes:
     hdfs-log:
     hdfs-log-app:
 
-# HDFS 데몬 : NameNode, SecondaryNameNode, DataNode
-# YARN 데몬 : ResourceManager, NodeManager, WebAppProxy
+# HDFS daemon : NameNode, SecondaryNameNode, DataNode
+# YARN daemon: ResourceManager, NodeManager, WebAppProxy
 # HDFS container must be run as root : sshd_config.permitRootLogin=true
 
 services:
@@ -84,5 +84,5 @@ services:
             - hdfs-datanode:${HDFS_DATANODE_HOME}
             - hdfs-datanode:${HDFS_DATANODE_HOME}/log
             - hdfs-datanode:${HDFS_DATANODE_HOME}/applog
-        working_dir: ${NODEWEB_WORK_DIR}
-        entrypoint: ${NODEWEB_WORK_DIR}
+        working_dir: ${HADOOP_HOME}
+        entrypoint: ${HADOOP_HOME}
