@@ -14,6 +14,9 @@ react-redux
 redux-sega
 redux-actions
 
+# web common
+qs
+
 # crypto
 brcypt
 jsonwebtoken

@@ -32,7 +32,7 @@ RUN npm install -g --save-dev eslint prettier eslint-config-prettier
 RUN npm install react react-dom react-router-dom react-app react-scripts 
 RUN npm install styled-components prop-types
 RUN npm install axios react-redux redux-actions redux-sega
-RUN npm install brcypt jsonwebtoken axios gh-pages
+RUN npm install brcypt jsonwebtoken axios gh-pages qs
 
 ENTRYPOINT ["/bin/bash"]
 
