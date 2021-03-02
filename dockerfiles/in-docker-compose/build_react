@@ -17,13 +17,12 @@ RUN npm cache clean -f
 RUN npm install -g n
 RUN n stable
 RUN npm install -y -g create-react-app
-RUN npm install -y -g --save-dev eslint prettier eslint-config-prettier eslint-plugin-react
+RUN npm install -y -g --save-dev eslint prettier eslint-config-prettier eslint-plugin-react gh-pages
 RUN npm init -y
 RUN eslint --init
 
-RUN npm install -y --save-dev eslint prettier eslint-config-prettier eslint-plugin-react
 RUN npm install -y -g react react-dom react-router-dom react-app react-scripts 
-RUN npm install -y -g styled-components prop-types
-RUN npm install -y -g axios brcypt jsonwebtoken axios gh-pages
+RUN npm install -y -g styled-components prop-types react-table
+RUN npm install -y -g axios brcypt jsonwebtoken axios faker cra-template
 
 ENTRYPOINT ["npm","run", "start"]

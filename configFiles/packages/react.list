@@ -4,10 +4,10 @@ react-dom
 react-router-dom
 react-app
 react-scripts
-create-react-app
-cra-template
-styled-components
 prop-types
+react-table
+create-react-app
+styled-components
 
 # redux
 react-redux
@@ -16,7 +16,14 @@ redux-actions
 
 # web common
 qs
+axios
+cra-template
 
 # crypto
 brcypt
 jsonwebtoken
+
+# data
+faker
+
+
