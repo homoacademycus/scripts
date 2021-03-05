@@ -12,9 +12,10 @@ echo -n "
 2. save docker image into gzip file
 3. load gzip file into docker image
 4. delete docker image
-5. stop and delete all docker container
+5. change image name
+6. stop and delete all docker container
 **********************************
---> enter number(0~5) : "
+--> enter number(0~6) : "
 read op
 
 case $op in
@@ -57,6 +58,16 @@ case $op in
     echo "deleted image $imagename"
     ;;
 5)
+    docker images
+    echo -n "enter old imagename:tag to change :"
+    read oldtag
+    echo -n "enter new imagename:tag to change :"
+    read newtag
+    docker image tag $oldtag $newtag
+    docker rmi $oldtag
+    docker images
+    ;;
+6)
     echo "stop all containers and delete"
     docker container stop $(docker ps -aq)
     docker container rm $(docker ps -aq)

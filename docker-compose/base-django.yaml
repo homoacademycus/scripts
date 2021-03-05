@@ -21,7 +21,7 @@ services:
         expose:
             - ${PORT_DJANGO}
         working_dir: ${DJANGO_WORK_DIR}
-        entrypoint: "sleep 99999" #${DJANGO_WORK_DIR}
+        entrypoint: "/bin/sh" #"sleep 99999"
 
     django-develop:
         extends: django-base
@@ -37,8 +37,9 @@ services:
         volumes:
             - ${HOST_WORK_DIR}/djangoApp:${DJANGO_WORK_DIR}
 #        command: 
-#            - "django-admin runserver --settings=config.django.debug" #개발용 test서버
-            #- "django-admin runserver --settings=config.django.deploy" #배포용 test서버
+#            - "python3 manage.py runserver 0.0.0.0:${PORT_BACKEND}"
+#            - "python3 manage.py runserver --settings=config.django.debug" #개발용 test서버
+#            - "python3 manage.py runserver --settings=config.django.deploy" #배포용 test서버
 
     django-product:
         extends: django-base
