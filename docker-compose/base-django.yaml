@@ -23,10 +23,9 @@ services:
     expose:
       - ${PORT_BACKEND}
     working_dir: ${WORKING_DIR}
-    entrypoint: "/bin/sh" #"sleep 99999"
-    command:
-      - "jupyter lab --app-dir=${WORKING_DIR}"
-      - "jupyter lab --generate-config"
+    entrypoint: "/bin/bash"
+  #    command:
+  #      - "sleep 99999;"
 
   django-develop:
     extends: django-base

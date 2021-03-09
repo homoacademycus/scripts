@@ -35,7 +35,7 @@ services:
     expose:
       - ${PORT_FRONTEND}
     working_dir: ${NGINX_CFG_DIR}
-    entrypoint: ${NGINX_CFG_DIR}
+    entrypoint: "/bin/bash"
 
   nginx-develop:
     extends: nginx-base
@@ -46,8 +46,6 @@ services:
       - SYS_ADMIN
     cap_add:
       - ALL
-    group_add:
-      - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
     volumes:
       - ${HOST_WORK_DIR}/nginx:${NGINX_CFG_DIR}
       - ${HOST_WORK_DIR}/nginx/logs:${NGINX_LOG_DIR}
