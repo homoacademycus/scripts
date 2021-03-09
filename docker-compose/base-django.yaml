@@ -15,7 +15,8 @@ services:
       dockerfile: build_django
       args: # allocate value to ARG vars in Dockerfile
         - appuser=${CONTAINER_USER}
-        - appgroup=${CONTAINER_GROUP}
+        - hostgid=${CONTAINER_GROUP}
+        - hostuser=${HOST_USER}
         - workingdir=${WORKING_DIR}
     networks:
       - backend-net

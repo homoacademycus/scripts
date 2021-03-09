@@ -2,19 +2,20 @@ FROM centos:7
 MAINTAINER homoacademycus
 
 ARG appuser
-ARG appgroup
+ARG hostgid
+ARG hostuser
 ARG workingdir
 
 RUN yum install -y epel-release
 RUN yum install -y git
 RUN yum install -y python3
 
-RUN groupadd ${appgroup}
-RUN useradd --groups ${appgroup} --create-home ${appuser} 
-RUN gpasswd --restrict ${appgroup}
+RUN groupadd --gid ${hostgid} ${hostuser}
+RUN useradd --gid ${hostgid} --create-home ${appuser} 
+RUN gpasswd --restrict ${hostuser}
 
 RUN mkdir -p ${workingdir}
-RUN chown -R ${appuser}:${appgroup} ${workingdir}
+RUN chown -R ${appuser}:${hostgid} ${workingdir}
 RUN chmod -R 770 ${workingdir}
 WORKDIR ${workingdir}
 
@@ -27,4 +28,4 @@ RUN pip3 install --user jupyterlab
 RUN export PATH=/home/${appuser}/.local/bin:$PATH
 RUN source /home/${appuser}/.bash_profile
 
-ENTRYPOINT "/bin/bash"
+ENTRYPOINT "/bin/sh"

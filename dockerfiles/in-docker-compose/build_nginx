@@ -1,8 +1,0 @@
-FROM centos:7
-MAINTAINER homoacademycus
-
-RUN yum install -y epel-release
-RUN yum install -y nginx
-RUN systemctl enable nginx
-
-ENTRYPOINT ["/bin/bash"]

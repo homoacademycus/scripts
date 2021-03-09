@@ -1,8 +1,0 @@
-# formatter
-eslint
-prettier
-eslint-config-prettier
-
-# watcher
-nodemon
-

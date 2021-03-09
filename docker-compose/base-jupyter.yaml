@@ -16,12 +16,13 @@ services:
       dockerfile: build_jupyter
       args: # allocate value to ARG vars in Dockerfile
         - appuser=${CONTAINER_USER}
-        - appgroup=${CONTAINER_GROUP}
+        - hostgid=${CONTAINER_GROUP}
+        - hostuser=${HOST_USER}
         - workingdir=${WORKING_DIR}
     networks:
       - backend-net
     working_dir: ${WORKING_DIR}
-    entrypoint: "/bin/sh"
+  #    entrypoint: "jupyter lab --generate-config"
 
   jupyter-develop:
     extends: jupyter-base
@@ -34,12 +35,14 @@ services:
     ports:
       - ${PORT_JUPYTER}:${PORT_JUPYTER}
     volumes:
-      - ${HOST_WORK_DIR}/jupyter/data:${JUPYTER_DATA_DIR}:rw
-      - ${HOST_WORK_DIR}/jupyter/runtime:${JUPYTER_RUNTIME_DIR}:rw
-      - ${HOST_WORK_DIR}/jupyter/cfg:${JUPYTER_CFG_DIR}:rw
-      - ${HOST_WORK_DIR}/jupyter/app:${WORKING_DIR}:rw
+      - ${HOST_WORK_DIR}/jupyter/data:/home/${CONTAINER_USER}/.local/share/jupyter:rw
+      - ${HOST_WORK_DIR}/jupyter/runtime:/home/${CONTAINER_USER}/.local/share/jupyter/runtimes:rw
+      - ${HOST_WORK_DIR}/jupyter/cfg:/home/${CONTAINER_USER}/.local/etc/jupyter:rw
+      - ${HOST_WORK_DIR}/jupyter/app:${WORKING_DIR}
     command:
-      - "jupyter lab --ip ${IP_ALLOWED} --port ${PORT_JUPYTER} --no-browser --core-mode --log-level='INFO' &"
+      - "source /home/${CONTAINER_USER}/.bash_profile"
+  #      - "jupyter lab --generate-config"
+  #      - "jupyter lab --ip ${IP_ALLOWED} --port ${PORT_JUPYTER} --no-browser --core-mode --log-level='INFO' &"
 
   jupyter-product:
     extends: jupyter-base

@@ -2,7 +2,7 @@ FROM centos:7
 MAINTAINER homoacademycus
 
 ARG appuser
-ARG appgroup
+ARG hostgid
 ARG workingdir
 
 RUN yum install -y epel-release
@@ -16,12 +16,13 @@ RUN npm install -y -g --save-dev eslint prettier eslint-config-prettier eslint-p
 RUN npm install -y -g create-react-app react react-app react-scripts react-dom react-router-dom
 RUN npm install -y -g styled-components prop-types cra-template axios brcypt jsonwebtoken faker
 
-RUN groupadd ${appgroup}
-RUN useradd --groups ${appgroup} --create-home ${appuser} 
-RUN gpasswd --restrict ${appgroup}
+ARG hostuser
+RUN groupadd --gid ${hostgid} ${hostuser}
+RUN useradd --gid ${hostgid} --create-home ${appuser} 
+RUN gpasswd --restrict ${hostuser}
 
 RUN mkdir -p ${workingdir}/static
-RUN chown -R ${appuser}:${appgroup} ${workingdir}
+RUN chown -R ${appuser}:${hostgid} ${workingdir}
 RUN chmod -R 770 ${workingdir}
 WORKDIR ${workingdir}
 
@@ -34,4 +35,4 @@ RUN rm -rf ${workingdir}/.eslintrc.json
 COPY packages/react.eslintrc.json ${workingdir}/.eslintrc.json
 COPY packages/npm.prettierrc ${workingdir}/.prettierrc
 
-ENTRYPOINT "/bin/sh"
+ENTRYPOINT "/bin/bash"

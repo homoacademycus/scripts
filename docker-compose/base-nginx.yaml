@@ -17,7 +17,8 @@ services:
       dockerfile: build_nginx
       args: # allocate value to ARG vars in Dockerfile
         - appuser=${CONTAINER_USER}
-        - appgroup=${CONTAINER_GROUP}
+        - hostgid=${CONTAINER_GROUP}
+        - hostuser=${HOST_USER}
         - workingdir=${NGINX_CFG_DIR}
         - staticdir=${NGINX_STATIC_DIR}
     networks:

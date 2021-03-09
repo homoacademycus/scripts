@@ -1,3 +1,0 @@
-
-
-RUN cp -r ${HOST_WORK_DIR}/hadoop/cfg/*.xml $HADOOP_CONFIG_HOME

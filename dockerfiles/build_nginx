@@ -2,7 +2,7 @@ FROM centos:7
 MAINTAINER homoacademycus
 
 ARG appuser
-ARG appgroup
+ARG hostgid
 ARG workingdir
 ARG staticdir
 
@@ -10,12 +10,13 @@ RUN yum install -y epel-release
 RUN yum install -y nginx
 RUN systemctl enable nginx
 
-RUN groupadd ${appgroup}
-RUN useradd --groups ${appgroup} --create-home ${appuser} 
-RUN gpasswd --restrict ${appgroup}
+ARG hostuser
+RUN groupadd --gid ${hostgid} ${hostuser}
+RUN useradd --gid ${hostgid} --create-home ${appuser} 
+RUN gpasswd --restrict ${hostuser}
 
-RUN chown -R ${appuser}:${appgroup} ${workingdir}
-RUN chown -R ${appuser}:${appgroup} ${staticdir}
+RUN chown -R ${appuser}:${hostgid} ${workingdir}
+RUN chown -R ${appuser}:${hostgid} ${staticdir}
 RUN chmod -R 770 ${workingdir}
 RUN chmod -R 770 ${staticdir}
 
@@ -24,4 +25,4 @@ WORKDIR ${workingdir}
 RUN passwd --lock root
 USER ${appuser}
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT "/bin/bash"

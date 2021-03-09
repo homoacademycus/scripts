@@ -17,7 +17,8 @@ services:
       dockerfile: build_react
       args: # allocate value to ARG vars in Dockerfile
         - appuser=${CONTAINER_USER}
-        - appgroup=${CONTAINER_GROUP}
+        - hostgid=${CONTAINER_GROUP}
+        - hostuser=${HOST_USER}
         - workingdir=${WORKING_DIR}
     tty: true
     volumes:
