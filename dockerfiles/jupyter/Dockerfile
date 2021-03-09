@@ -21,10 +21,9 @@ RUN chmod -R 775 /home/${appuser}
 RUN yum install -y git
 RUN yum install -y python3
 
-RUN passwd -l root
 USER ${appuser}
 RUN pip3 install -r jupyter
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT "/bin/bash"
 
 

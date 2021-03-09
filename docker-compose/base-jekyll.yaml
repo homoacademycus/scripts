@@ -1,0 +1,25 @@
+version: "2" # v3 does not support 'extends' yet
+
+networks:
+    backend-net:
+
+services:
+    jekyll-local:
+        image: jekyll/jekyll:latest
+        tty: true
+        volumes:
+            - ${HOST_WORK_DIR}/jekyllApp:${JEKYLL_WORK_DIR}
+        networks:
+            - backend-net
+        ports:
+            - ${PORT_JEKYLL}:${PORT_JEKYLL}
+        cap_add:
+            - ALL
+        cap_drop:
+            - MAC_ADMIN
+            - NET_ADMIN
+            - SYS_ADMIN
+        working_dir: ${JEKYLL_WORK_DIR}
+        entrypoint: "/bin/bash" #"sleep 99999"
+#        command: "jekyll serve --watch"
+

@@ -10,7 +10,7 @@ volumes:
 
 services:
     react-develop:
-        image: react-website:2021-03-01 #react:centos7
+        image: react:centos7
         build:
             shm_size: '1GB'
             context: ../dockerfiles/in-docker-compose
@@ -29,7 +29,7 @@ services:
         ports:
             - ${PORT_REACT}:${PORT_REACT}
         expose:
-            - ${PORT_REACT}
+            - ${PORT_NGINX}
         cap_drop:
             - MAC_ADMIN
             - NET_ADMIN
@@ -37,7 +37,7 @@ services:
         cap_add:
             - ALL
         working_dir: ${REACT_WORK_DIR}
-        entrypoint: "sleep 99999"
+        entrypoint: "/bin/bash" #"sleep 99999"
 #        command: ["npm","run","start"]
 
 

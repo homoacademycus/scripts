@@ -1,9 +1,26 @@
 FROM centos:7
 MAINTAINER homoacademycus
 
+ARG workingdir=/datalab
+ARG appuser=jupyter
+
 RUN yum install -y epel-release
 RUN yum install -y git
 RUN yum install -y python3
-RUN pip3 install jupyter
 
-ENTRYPOINT ["/bin/bash"]
+RUN useradd --create-home --user-group ${appuser} 
+RUN gpasswd --restrict ${appuser}
+
+# Install to the Python user install directory(~/.local)
+RUN pip3 install --user ${appuser} jupyter
+RUN pip3 install --user ${appuser} jupyterlab
+
+RUN mkdir -p ${workingdir}
+RUN chown -R ${appuser}:root ${workingdir}
+RUN chmod -R 770 ${workingdir}
+WORKDIR ${workingdir}
+
+RUN passwd --lock root
+USER ${appuser}
+
+ENTRYPOINT "/bin/bash"

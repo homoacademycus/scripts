@@ -15,12 +15,10 @@ services:
         expose:
             - ${PORT_POSTGRES}
         environment:
-            POSTGRES_DATABASE: ${INIT_DATABASE}
+            POSTGRES_DATABASE: ${POSTGRES_DATABASE}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWD}
         working_dir: ${POSTGRES_DATA_DIR}
-        command:
-            - --character-set-server=utf8mb4
-            - --collation-server=utf8mb4_unicode_ci
+        entrypoint: "/bin/sh"
 
     postgres-develop:
         extends: postgres-base
