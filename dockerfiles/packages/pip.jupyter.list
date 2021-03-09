@@ -1,0 +1,6 @@
+#pip freeze > pip.list
+#pip install -r pip.list
+
+jupyterlab
+#jupyterthemes
+

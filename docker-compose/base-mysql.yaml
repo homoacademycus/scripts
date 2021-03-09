@@ -1,76 +1,76 @@
 version: "2" # v3 does not support 'extends' yet
 
 networks:
-    backend-net:
+  backend-net:
 
 volumes:
-    web-static:
-    data-mysql:
+  web-static:
+  data-mysql:
 
 services:
-    mysql-base:
-        image: mysql:latest
-        networks:
-            - backend-net
-        expose:
-            - ${PORT_MYSQL}
-        environment:
-            MYSQL_DATABASE: ${INIT_DATABASE}
-            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWD}
-        working_dir: ${MYSQL_DATA_DIR}
-        command:
-            - --character-set-server=utf8mb4
-            - --collation-server=utf8mb4_unicode_ci
+  mysql-base:
+    image: mysql:latest
+    networks:
+      - backend-net
+    expose:
+      - ${PORT_MYSQL}
+    environment:
+      MYSQL_DATABASE: ${INIT_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWD}
+    working_dir: ${MYSQL_DATA_DIR}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
 
-    mysql-develop:
-        extends: mysql-base
-        tty: true
-        cap_drop:
-            - MAC_ADMIN
-            - NET_ADMIN
-            - SYS_ADMIN
-        cap_add:
-            - ALL
-        volumes:
-            - ${HOST_WORK_DIR}/data/mysql:${MYSQL_DATA_DIR}
+  mysql-develop:
+    extends: mysql-base
+    tty: true
+    cap_drop:
+      - MAC_ADMIN
+      - NET_ADMIN
+      - SYS_ADMIN
+    cap_add:
+      - ALL
+    volumes:
+      - ${HOST_WORK_DIR}/data/mysql:${MYSQL_DATA_DIR}
 
-    mysql-product:
-        extends: mysql-base
-        tty: false
-        read_only: true
-        privileged: false
-#        security_opt:
-#          - label:user:USERNAME #labeling scheme for each container
-#          - label:role:ROLENAME #labeling scheme for each container
-        user: mysql
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
-        tmpfs:
-            #- ${MYSQL_LOG_DIR}:uid=${CONTAINER_UID},gid=${CONTAINER_GID}
-            - /tmp
-        volumes:
-            - data-mysql:${MYSQL_DATA_DIR}:ro
-            - ${MYSQL_CFG_DIR}
-            - ${MYSQL_LOG_DIR}
+  mysql-product:
+    extends: mysql-base
+    tty: false
+    read_only: true
+    privileged: false
+    #        security_opt:
+    #          - label:user:USERNAME #labeling scheme for each container
+    #          - label:role:ROLENAME #labeling scheme for each container
+    user: mysql
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    tmpfs:
+      #- ${MYSQL_LOG_DIR}:uid=${CONTAINER_UID},gid=${CONTAINER_GID}
+      - /tmp
+    volumes:
+      - data-mysql:${MYSQL_DATA_DIR}:rw
+      - ${MYSQL_CFG_DIR}
+      - ${MYSQL_LOG_DIR}
 
-    mysql-helper:
-        image: ubuntu:latest
-        networks:
-            - backend-net
-        expose:
-            - ${PORT_MYSQL}
-        cap_drop:
-            - MAC_ADMIN
-            - NET_ADMIN
-            - SYS_ADMIN
-        cap_add:
-            - ALL
-        tty: true
-        volumes_from:
-            - mysql-product:${MYSQL_DATA_DIR}
-            - mysql-product:${MYSQL_CFG_DIR}
-            - mysql-product:${MYSQL_LOG_DIR}
-        working_dir: ${MYSQL_DATA_DIR}
-        entrypoint: ${MYSQL_DATA_DIR}
+  mysql-helper:
+    image: ubuntu:latest
+    networks:
+      - backend-net
+    expose:
+      - ${PORT_MYSQL}
+    cap_drop:
+      - MAC_ADMIN
+      - NET_ADMIN
+      - SYS_ADMIN
+    cap_add:
+      - ALL
+    tty: true
+    volumes_from:
+      - mysql-product:${MYSQL_DATA_DIR}
+      - mysql-product:${MYSQL_CFG_DIR}
+      - mysql-product:${MYSQL_LOG_DIR}
+    working_dir: ${MYSQL_DATA_DIR}
+    entrypoint: ${MYSQL_DATA_DIR}

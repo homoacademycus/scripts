@@ -1,0 +1,28 @@
+#pip freeze > pip.list
+#pip install -r pip.list
+
+asgiref==3.3.1
+uvicorn==0.13.4
+gunicorn==20.0.4
+Django==3.1.7
+django-cors-headers==3.7.0
+djangorestframework==3.12.2
+djangorestframework-simplejwt==4.4.0
+django-filter==2.4.0
+psycopg2-binary==2.8.6 #postgre-client
+django-redis==4.12.1
+PyJWT==2.0.1
+h11==0.12.0
+python-decouple==3.4 #setting
+pytz==2021.1
+redis==3.5.3
+sqlparse==0.4.1
+typing-extensions==3.7.4.3
+click==7.1.2
+
+#django-rest-swagger
+#mysqlclient
+#elasticsearch-dsl
+#swagger
+#pyinstaller
+

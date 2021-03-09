@@ -1,0 +1,8 @@
+# formatter
+eslint
+eslint-plugin-react
+prettier
+eslint-config-prettier
+
+# delpoy
+gh-pages

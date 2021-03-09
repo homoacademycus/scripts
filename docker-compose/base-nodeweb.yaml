@@ -1,73 +1,77 @@
 version: "2" # v3 does not support 'extends' yet
 
 networks:
-    backend-net:
+  backend-net:
 
 volumes:
-    web-static:
+  web-static:
 
 services:
-    nodeweb-base:
-        image: nodeweb:centos7
-        build:
-            shm_size: '1GB'
-            context: ../dockerfiles/in-docker-compose
-            dockerfile: build_nodeweb
-        networks:
-            - backend-net
-        expose:
-            - ${PORT_WEB_APP}
-        working_dir: ${NODEWEB_WORK_DIR}
-        entrypoint: ${NODEWEB_WORK_DIR}
-        command: ["npm","run","start"]
+  nodeweb-base:
+    image: nodeweb:centos7
+    build:
+      shm_size: "1GB"
+      context: ../dockerfiles
+      dockerfile: build_nodeweb
+      args: # allocate value to ARG vars in Dockerfile
+        - appuser=${CONTAINER_USER}
+        - appgroup=${CONTAINER_GROUP}
+        - workingdir=${WORKING_DIR}
+    networks:
+      - backend-net
+    expose:
+      - ${PORT_BACKEND}
+    working_dir: ${WORKING_DIR}
+    entrypoint: ${WORKING_DIR}
 
-    nodeweb-develop:
-        extends: nodeweb-base
-        tty: true
-        cap_drop:
-            - MAC_ADMIN
-            - NET_ADMIN
-            - SYS_ADMIN
-        cap_add:
-            - ALL
-        volumes:
-            - ${HOST_WORK_DIR}/nodeApp:${NODEWEB_WORK_DIR}
-            - ${HOST_WORK_DIR}/web-static:${NODEWEB_STATIC_DIR}
+  nodeweb-develop:
+    extends: nodeweb-base
+    tty: true
+    cap_drop:
+      - MAC_ADMIN
+      - NET_ADMIN
+      - SYS_ADMIN
+    cap_add:
+      - ALL
+    volumes:
+      - ${HOST_WORK_DIR}/nodeApp:${WORKING_DIR}
+      - ${HOST_WORK_DIR}/web-static:${WORKING_DIR}/static
+    command: "npm run start"
 
-    nodeweb-product:
-        extends: nodeweb-base
-        tty: false
-        read_only: true
-        privileged: false
-        user: nodeweb
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
-        group_add:
-            - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
-#        security_opt:
-#          - label:user:USERNAME #labeling scheme for each container
-#          - label:role:ROLENAME #labeling scheme for each container
-        volumes:
-            - ${NODEWEB_WORK_DIR}:ro
-            - web-static:${NODEWEB_STATIC_DIR}:ro
+  nodeweb-product:
+    extends: nodeweb-base
+    tty: false
+    read_only: true
+    privileged: false
+    user: nodeweb
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    group_add:
+      - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
+    #        security_opt:
+    #          - label:user:USERNAME #labeling scheme for each container
+    #          - label:role:ROLENAME #labeling scheme for each container
+    volumes:
+      - ${WORKING_DIR}:ro
+      - web-static:${WORKING_DIR}/static:ro
+    command: "npm run start"
 
-    nodeweb-helper:
-        image: ubuntu:latest
-        tty: true
-        networks:
-            - backend-net
-        expose:
-            - ${PORT_WEB_APP}
-        cap_drop:
-            - MAC_ADMIN
-            - NET_ADMIN
-            - SYS_ADMIN
-        cap_add:
-            - ALL
-        volumes_from:
-            - nodeweb-product:${NODEWEB_WORK_DIR}
-        working_dir: ${NODEWEB_WORK_DIR}
-        entrypoint: ${NODEWEB_WORK_DIR}
-
+  nodeweb-helper:
+    image: ubuntu:latest
+    tty: true
+    networks:
+      - backend-net
+    ports:
+      - ${PORT_BACKEND}:${PORT_BACKEND}
+    cap_drop:
+      - MAC_ADMIN
+      - NET_ADMIN
+      - SYS_ADMIN
+    cap_add:
+      - ALL
+    volumes_from:
+      - nodeweb-product:${WORKING_DIR}
+    working_dir: ${WORKING_DIR}
+    entrypoint: ${WORKING_DIR}

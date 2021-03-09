@@ -1,87 +1,69 @@
-
 version: "2" # v3 does not support 'extends' yet
 
 networks:
-    backend-net:
+  backend-net:
 
 volumes:
-    web-static:
+  web-static:
 
 services:
-    django-base:
-        image: django:centos7
-        build:
-            shm_size: '1GB'
-            context: ../dockerfiles/in-docker-compose
-            dockerfile: build_django        
-        environment:
-            DJANGO_WORK_DIR: ${DJANGO_WORK_DIR}
-        networks:
-            - backend-net
-        expose:
-            - ${PORT_WEB_APP}
-        working_dir: ${DJANGO_WORK_DIR}
-        entrypoint: "/bin/sh" #"sleep 99999"
+  django-base:
+    image: django:centos7
+    build:
+      shm_size: "1GB"
+      context: ../dockerfiles
+      dockerfile: build_django
+      args: # allocate value to ARG vars in Dockerfile
+        - appuser=${CONTAINER_USER}
+        - appgroup=${CONTAINER_GROUP}
+        - workingdir=${WORKING_DIR}
+    networks:
+      - backend-net
+    expose:
+      - ${PORT_BACKEND}
+    working_dir: ${WORKING_DIR}
+    entrypoint: "/bin/sh" #"sleep 99999"
+    command:
+      - "jupyter lab --app-dir=${WORKING_DIR}"
+      - "jupyter lab --generate-config"
 
-    django-develop:
-        extends: django-base
-        tty: true
-        cap_drop:
-            - MAC_ADMIN
-            - NET_ADMIN
-            - SYS_ADMIN
-        cap_add:
-            - ALL
-        ports:
-            - ${PORT_DJANGO}:${PORT_DJANGO}
-        volumes:
-            - ${HOST_WORK_DIR}/djangoApp:${DJANGO_WORK_DIR}
-#        command: 
-#            - "python3 manage.py runserver 0.0.0.0:${PORT_DJANGO}"
-#            - "python3 manage.py runserver --settings=config.django.debug" #개발용 test서버
-#            - "python3 manage.py runserver --settings=config.django.deploy" #배포용 test서버
+  django-develop:
+    extends: django-base
+    tty: true
+    cap_drop:
+      - MAC_ADMIN
+      - NET_ADMIN
+      - SYS_ADMIN
+    cap_add:
+      - ALL
+    ports:
+      - ${PORT_DJANGO}:${PORT_DJANGO}
+    volumes:
+      - ${HOST_WORK_DIR}/djangoApp:${WORKING_DIR}
+  #        command:
+  #            - "python3 manage.py runserver ${IP_ALLOWED}:${PORT_DJANGO}"
+  #            - "python3 manage.py runserver --settings=config.django.debug" #개발용 test서버
+  #            - "python3 manage.py runserver --settings=config.django.deploy" #배포용 test서버
 
-    django-product:
-        extends: django-base
-        tty: false
-        read_only: true
-        privileged: false
-        cap_drop:
-          - ALL
-        cap_add:
-          - NET_BIND_SERVICE
-#        security_opt:
-#          - label:user:USERNAME #labeling scheme for each container
-#          - label:role:ROLENAME #labeling scheme for each container
-        user: django
-        group_add:
-            - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
-        volumes:
-            - ${DJANGO_CFG_DIR}
-            - ${DJANGO_LOG_DIR}
-            - ${DJANGO_STATIC_DIR}
-            - web-static:${DJANGO_STATIC_DIR}:ro
-        command:
-            #- "gunicorn -w 4 -k uvicorn.workers.UvicornWorker" #asgi서버
-            - "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT_DJANGO}" #wsgi서버
-
-    django-helper:
-        image: ubuntu:latest
-        networks:
-            - backend-net
-        expose:
-            - ${PORT_DJANGO}
-        cap_drop:
-            - MAC_ADMIN
-            - NET_ADMIN
-            - SYS_ADMIN
-        cap_add:
-            - ALL
-        tty: true
-        volumes_from:
-            - django-product:${DJANGO_CFG_DIR}
-            - django-product:${DJANGO_STATIC_DIR}
-            - django-product:${DJANGO_LOG_DIR}
-        working_dir: ${DJANGO_WORK_DIR}
-        entrypoint: ${DJANGO_WORK_DIR}
+  django-product:
+    extends: django-base
+    tty: false
+    read_only: true
+    privileged: false
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    #        security_opt:
+    #          - label:user:USERNAME #labeling scheme for each container
+    #          - label:role:ROLENAME #labeling scheme for each container
+    user: django
+    group_add:
+      - ${CONTAINERS_GROUP} #to rw on same Host File(소유권한 그룹)
+    volumes:
+      - ${WORKING_DIR}:ro
+      - web-static:${DJANGO_STATIC_DIR}:ro
+    command:
+      #- "gunicorn -w 4 -k uvicorn.workers.UvicornWorker" #asgi서버
+      - "gunicorn config.wsgi:application --bind ${IP_ALLOWED}:${PORT_DJANGO}" #wsgi서버
 

@@ -1,38 +1,51 @@
 # BE CAREFUL!! STRICT RULE TO EXEXUTE
+
 1. contextDir
-docker file context must be a directory. please copy proper files from path below.
+   docker file context must be a directory. please copy proper files from path below.
+
 - (.sh) : ../bash
 - (.list) : ../configFiles
+- possible to set in docker-compose's build field
 
 2. Dockerfile
+
 - must be located in contextDir/Dockerfile
 - filename must be a "Dockerfile"
 - possible to use another filename in docker-compose's build field
 
 3. build command
-running the following command from the directory where the Dockerfile is located.
+   running the following command from the directory where the Dockerfile is located.
+
 ```
 docker build --tag "imagename:tag" contextDir
 ```
 
 4. check image
+
 ```
 docker images
 ```
 
 5. change image tag
+
 ```
 docker image tag oldImageName:tag newImageName:tag
 ```
+
 imageName:tag would not get set when there is an error in the build.
 
 6. installation
+
 - interactive shell will cause error : must put -y option on package installation
 
 7. docker-compose file
+
 - use dockerfile only for installing packages which needs root permision
 - possible to set build option in docker-compose file
 - don't waste your time with strict dockerfile rules
 
-8. entry point
-- Entrypoint can't point to /bin/bash
+# THESE FILES ARE USED FOR DOCKER_COMPOSE
+
+- if you want to use without docker-compose, just copy and change name as "Dockerfiles" and add ARG paramname=paramvalue in "Dockerfiles"
+
+- USER instruction sets the user name (UID,GID) to use when running the image and for any RUN, CMD and ENTRYPOINT instructions that follow it in the Dockerfile.

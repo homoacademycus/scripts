@@ -1,43 +1,47 @@
 version: "2" # v3 does not support 'extends' yet
 
 networks:
-    frontend-net:
-        external: true
-    backend-net:
+  frontend-net:
+    external: true
+  backend-net:
 
 volumes:
-    web-static:
+  web-static:
 
 services:
-    react-develop:
-        image: react:centos7
-        build:
-            shm_size: '1GB'
-            context: ../dockerfiles/in-docker-compose
-            dockerfile: build_react
-        tty: true
-        volumes:
-            - ${HOST_WORK_DIR}/reactApp:${REACT_WORK_DIR}
-            - web-static:${REACT_STATIC_DIR}
-        networks:
-            - frontend-net
-            - backend-net
-        external_links:
-            - nodeweb
-            - django
-            - jupyter
-        ports:
-            - ${PORT_REACT}:${PORT_REACT}
-        expose:
-            - ${PORT_NGINX}
-        cap_drop:
-            - MAC_ADMIN
-            - NET_ADMIN
-            - SYS_ADMIN
-        cap_add:
-            - ALL
-        working_dir: ${REACT_WORK_DIR}
-        entrypoint: "/bin/bash" #"sleep 99999"
-#        command: ["npm","run","start"]
-
-
+  react-develop:
+    image: react:centos7
+    build:
+      shm_size: "1GB"
+      context: ../dockerfiles
+      dockerfile: build_react
+      args: # allocate value to ARG vars in Dockerfile
+        - appuser=${CONTAINER_USER}
+        - appgroup=${CONTAINER_GROUP}
+        - workingdir=${WORKING_DIR}
+    tty: true
+    volumes:
+      - ${HOST_WORK_DIR}/reactApp:${WORKING_DIR}
+      - web-static:${WORKING_DIR}/static
+    networks:
+      - frontend-net
+      - backend-net
+    external_links:
+      - nodeweb
+      - django
+      - jupyter
+    ports:
+      - ${PORT_REACT}:${PORT_REACT}
+    expose:
+      - ${PORT_FRONTEND}
+    cap_drop:
+      - MAC_ADMIN
+      - NET_ADMIN
+      - SYS_ADMIN
+    cap_add:
+      - ALL
+    working_dir: ${WORKING_DIR}
+    entrypoint: "/bin/sh"
+#    command:
+#      - "sleep 99999"
+#      - "npm run start"

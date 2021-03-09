@@ -2,25 +2,67 @@
 COMPOSE_PROJECT_NAME="test"
 
 # HOST VOLUME
-HOST_WORK_DIR=/home/programmer/workspace
+HOST_WORK_DIR=${HOME}/workspace
 
-# CONTAINER USER
-CONTAINER_UID=30680
-CONTAINER_GID=30680
-CONTAINERS_GROUP=containersGroup
+# CONTAINER
+CONTAINER_USER=containeruser
+CONTAINER_GROUP=${USERNAME}
+WORKING_DIR=/home/${CONTAINER_USER}/workspace
+
+# TO DOCKERFILE
+NODEWEB_STATIC_DIR=/nodeApp/static
+
+# FOR DEVELOP
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+MONGO_URI=mongodb://mongodbContainerName:port/myPost
 
 # DB ROOT PASSWORD
 MYSQL_PASSWORD=testpswd
 COUCHDB_PASSWORD=dbpasswd
 POSTGRES_PASSWORD=dbpasswd
-INIT_DATABASE=init
-POSTGRES_DATABASE=postgres
 
 # DB NON-ROOT USER
-MYSQL_USER=dbadmin
+MYSQL_USER=mysql
 COUCHDB_USER=dbadmin
 POSTGRES_USER=postgres
 
+# DATABASE CREATED
+INIT_DATABASE=init
+POSTGRES_DATABASE=postgres
+
+IP_ALLOWED=0.0.0.0
+#IP_ALLOWED=localhost
+
+# CONTAINER VOLUME - WEB SERVICE
+NGINX_CFG_DIR=/etc/nginx
+NGINX_LOG_DIR=/var/log/nginx/log
+NGINX_STATIC_DIR=/usr/share/nginx/html
+JEKYLL_WORK_DIR=/srv/jekyll
+
+# CONTAINER VOLUME - DB
+MONGO_CFG_DIR=/etc/mongod
+MONGO_DATA_DIR=/var/lib/mongo
+MYSQL_CFG_DIR=/etc/mysql
+MYSQL_DATA_DIR=/var/lib/mysql
+MYSQL_RUNTIME_DIR=/run/mysqld
+POSTGRES_CFG_DIR=/etc/postgresql-common
+POSTGRES_DATA_DIR=/var/lib/postgresql/data
+POSTGRES_LOG_DIR=/var/log/postgresql
+ELASTIC_CFG_DIR=/etc/
+
+# CONTAINER VOLUME - DATA PIPELINE
+JUPYTER_CFG_DIR=/home/${CONTAINER_USER}/.local/etc/jupyter
+JUPYTER_DATA_DIR=/home/${CONTAINER_USER}/.local/share/jupyter
+JUPYTER_RUNTIME_DIR=/home/${CONTAINER_USER}/.local/share/jupyter/runtimes
+HADOOP_HOME=/hadoop_home/hadoop-3.2.1
+SPARK_HOME=//hadoop_home/spark-3.0.0
+HDFS_DATANODE_HOME=/hdfs/datanode
+HDFS_NAMENODE_HOME=/hdfs/namenode
+
+# PORT-CUSTOM
+PORT_FRONTEND=44380
+PORT_BACKEND=28282
+${IP_ALLOWED}
 # PORT - GERENAL
 PORT_HTTP=80
 PORT_HTTPS=443
@@ -29,6 +71,7 @@ PORT_SSH=22
 # PORT - SERVICE
 PORT_REACT=3000
 PORT_DJANGO=8000
+PORT_JUPYTER=8888
 PORT_JEKYLL=4000
 PORT_JEKYLL_INTERNAL=35729
 PORT_MYSQL=3306
@@ -45,46 +88,5 @@ PORT_HDFS_NAMENODE_WEB_UI=9870
 PORT_YARN_RESOURCE_MANAGER_WEB_UI=8088
 PORT_HDFS_HISTORY_SERVER_WEB_UI=19888
 
-# PORT-CUSTOM
-PORT_NGINX=44380
-PORT_WEB_APP=28282
-PORT_JUPYTER=8888
 
-# CONTAINER VOLUME - WEB SERVICE
-NGINX_CFG_DIR=/etc/nginx
-NGINX_LOG_DIR=/var/log/nginx/log
-NGINX_CONTENT_DIR=/usr/share/nginx/html
-NGINX_STATIC_DIR=/
-REACT_WORK_DIR=/reactApp
-REACT_STATIC_DIR=/reactApp/static
-DJANGO_WORK_DIR=/djangoApp
-DJANGO_CFG_DIR=/djangoApp/configs
-DJANGO_STATIC_DIR=/djangoApp/static
-NODEWEB_WORK_DIR=/nodeApp
-NODEWEB_STATIC_DIR=/nodeApp/static
-JEKYLL_WORK_DIR=/srv/jekyll
 
-# CONTAINER VOLUME - DB
-MONGO_CFG_DIR=/etc/mongod
-MONGO_DATA_DIR=/var/lib/mongo
-MYSQL_CFG_DIR=/etc/mysql
-MYSQL_DATA_DIR=/var/lib/mysql
-MYSQL_RUNTIME_DIR=/run/mysqld
-POSTGRES_CFG_DIR=/etc/postgresql-common
-POSTGRES_DATA_DIR=/var/lib/postgresql/data
-POSTGRES_LOG_DIR=/var/log/postgresql
-ELASTIC_CFG_DIR=/
-
-# CONTAINER VOLUME - DATA PIPELINE
-JUPYTER_CFG_DIR=/usr/local/etc/jupyter
-JUPYTER_DATA_DIR=/usr/local/share/jupyter
-JUPYTER_RUNTIME_DIR=/home/jupyter/.local/share/jupyter/runtimes
-JUPYTER_WORK_DIR=/datalab
-HADOOP_HOME=/hadoop_home/hadoop-3.2.1
-SPARK_HOME=/
-HDFS_DATANODE_HOME=/hdfs/datanode
-HDFS_NAMENODE_HOME=/hdfs/namenode
-
-# FOR DEVELOP
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-MONGO_URI=mongodb://mongodbContainerName:port/myPost
