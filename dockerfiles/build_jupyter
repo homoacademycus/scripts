@@ -19,13 +19,15 @@ RUN chown -R ${appuser}:${hostgid} ${workingdir}
 RUN chmod -R 770 ${workingdir}
 WORKDIR ${workingdir}
 
+RUN echo "export PATH=/home/${appuser}/.local/bin:$PATH" >> /etc/environment
+RUN source /etc/environment
+#RUN export PATH=/home/${appuser}/.local/bin:$PATH
+#RUN source /home/${appuser}/.bash_profile
+
 RUN passwd --lock root
 USER ${appuser}
 
 # Install to the Python user install directory (/home/${appuser}/.local)
 RUN pip3 install --user jupyterlab
-
-RUN export PATH=/home/${appuser}/.local/bin:$PATH
-RUN source /home/${appuser}/.bash_profile
 
 ENTRYPOINT "/bin/sh"
