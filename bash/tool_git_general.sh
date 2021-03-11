@@ -3,7 +3,9 @@
 # Copyright homoacademycus@github.com
 # MIT Licnese
 #
-path_current_dir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
+path_current_dir=${PWD}
+script_dir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
+echo "script dir path is : $script_dir"
 echo "current dir path is : $path_current_dir"
 
 echo -n "set local git repository path :"
