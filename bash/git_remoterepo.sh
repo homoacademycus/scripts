@@ -50,10 +50,11 @@ case $sel in
     git add ./*
     git commit -m 'set remote repo..'
     git push --set-upstream origin $refname
-    
+    ;;
 *)
     echo "you typed wrong input. please try again."
-    break;
+    break
+    ;;
 esac
 git remote add origin $remoteurl
 git remote set-url origin $remoteurl
