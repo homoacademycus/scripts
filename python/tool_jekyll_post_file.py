@@ -1,3 +1,5 @@
+#!/bin/python3
+
 from datetime import datetime, date, timezone, timedelta
 from pathlib import PurePath, Path
 import json
@@ -27,7 +29,7 @@ class jekyllFileTool():
                 pass
 
 
-testData = '{"layout": "post","categories": "Installation","title":"","feature-img": "assets/img/feature_img.png"}'
+testData = '{"layout": "post","categories": "TroubleShooting","title":"","feature-img": "assets/img/feature_img.png"}'
 targetPath = input('set target path(default=current dir path):')
 tool = jekyllFileTool(targetPath)
 tool.formatMdFilename(testData)

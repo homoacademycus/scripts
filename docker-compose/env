@@ -1,13 +1,13 @@
 # envar for docker-compose
 COMPOSE_PROJECT_NAME="test"
 
-# HOST VOLUME
+# HOST
 HOST_WORK_DIR=/home/programmer/workspace
+HOST_USER=programmer
 
 # CONTAINER
 CONTAINER_USER=containeruser
 CONTAINER_GROUP=1001
-HOST_USER=programmer
 WORKING_DIR=/home/containeruser/workspace
 
 # TO DOCKERFILE

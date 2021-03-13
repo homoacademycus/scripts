@@ -16,7 +16,7 @@ services:
             - ${PORT_POSTGRES}
         environment:
             POSTGRES_DATABASE: ${POSTGRES_DATABASE}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWD}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         working_dir: ${POSTGRES_DATA_DIR}
         entrypoint: "/bin/sh"
 
@@ -37,14 +37,14 @@ services:
         tty: false
         read_only: true
         privileged: false
-#        security_opt:
-#          - label:user:USERNAME #labeling scheme for each container
-#          - label:role:ROLENAME #labeling scheme for each container
+        #        security_opt:
+        #          - label:user:USERNAME #labeling scheme for each container
+        #          - label:role:ROLENAME #labeling scheme for each container
         user: postgres
         cap_drop:
-          - ALL
+            - ALL
         cap_add:
-          - NET_BIND_SERVICE
+            - NET_BIND_SERVICE
         tmpfs:
             #- ${POSTGRES_LOG_DIR}:uid=${CONTAINER_UID},gid=${CONTAINER_GID}
             - /tmp

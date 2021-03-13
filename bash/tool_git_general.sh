@@ -49,10 +49,10 @@ case $op in
     ls -al | grep .git
     ;;
 2)
-    . $path_current_dir/git_remoterepo.sh
+    . $script_dir/git_remoterepo.sh
     ;;
 3)
-    . $path_current_dir/git_branchManager.sh
+    . $script_dir/git_branchManager.sh
     ;;
 4)
     git add ./*
@@ -65,7 +65,7 @@ case $op in
     git push
     ;;
 5)
-    . $path_current_dir/git_rollback.sh
+    . $script_dir/git_rollback.sh
     ;;
 6)
     echo -n "enter filename to remove :"
