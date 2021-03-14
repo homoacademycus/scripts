@@ -15,20 +15,20 @@ services:
         expose:
             - ${PORT_POSTGRES}
         environment:
-            POSTGRES_DATABASE: ${POSTGRES_DATABASE}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            - POSTGRES_DB=${POSTGRES_DATABASE}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
         working_dir: ${POSTGRES_DATA_DIR}
-        entrypoint: "/bin/sh"
 
     postgres-develop:
         extends: postgres-base
         tty: true
+        cap_add:
+            - ALL
         cap_drop:
             - MAC_ADMIN
             - NET_ADMIN
             - SYS_ADMIN
-        cap_add:
-            - ALL
         volumes:
             - ${HOST_WORK_DIR}/data/postgres:${POSTGRES_DATA_DIR}
 
