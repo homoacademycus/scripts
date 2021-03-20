@@ -17,8 +17,9 @@ python-decouple==3.4 #setting
 pytz==2021.1
 redis==3.5.3
 sqlparse==0.4.1
-typing-extensions==3.7.4.3
-click==7.1.2
+celery==5.0.5
+django-celery-beat==2.2.0 #celery-in-admin-site
+django-celery-results==2.0.1
 
 #django-rest-swagger
 #mysqlclient
